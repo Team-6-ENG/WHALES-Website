@@ -1,0 +1,32 @@
+.content {
+    background-color: blueviolet;
+    justify-content: center;
+    padding: 20px;
+}
+
+.centre-content {
+    background-color: white;
+
+    display: flex;
+    flex-direction: column;
+    max-width: 50%;
+    min-width: 80%;
+    flex-grow: 1;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.return-home {
+    width: 50%;
+    margin: 0;
+    margin-bottom: 20px;
+}
+
+.snapshot-link-container {
+    display: flex;
+}
+
+.snapshot-link-container .access-link {
+    background-color: cadetblue;
+    width: 50%;
+}
