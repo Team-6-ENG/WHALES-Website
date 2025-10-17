@@ -62,6 +62,10 @@ hr {
     max-height: 1em;
 }
 
+.repo-link {
+    background-color: darkolivegreen;
+}
+
 @media screen and (max-width: 1100px) {
     .access-link {
         font-size: smaller;
