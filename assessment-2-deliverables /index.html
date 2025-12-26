@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../style.css">
+    <title>Assessment 2 Deliverables</title>
+
+    <style>
+        .a2-tabs{
+          display:flex;
+          gap:28px;
+          padding:14px 18px;
+          background:#1e1f2f;
+          color:white;
+          border-radius:10px;
+          margin-bottom:20px;
+          flex-wrap:wrap;
+          align-items:center;
+        }
+        .a2-tabs a, .a2-tabs span{
+          color:white;
+          text-decoration:none;
+          font-weight:600;
+          cursor:pointer;
+        }
+        .a2-tabs a:hover, .a2-tabs span:hover{ text-decoration:underline; }
+
+        .dropdown{ position:relative; }
+        .dropdown-content{
+          display:none;
+          position:absolute;
+          top:22px;
+          left:0;
+          background:#2a2b40;
+          border-radius:8px;
+          min-width:200px;
+          z-index:10;
+          padding:6px 0;
+        }
+        .dropdown-content a{
+          display:block;
+          padding:8px 14px;
+          color:white;
+        }
+        .dropdown-content a:hover{ background:rgba(255,255,255,0.12); }
+        .dropdown:hover .dropdown-content{ display:block; }
+
+        section{ margin: 30px 0; }
+    </style>
+</head>
+
+<body>
+<div class="content">
+    <div class="centre-content">
+
+        <!-- Tabs (you MUST see this) -->
+        <nav class="a2-tabs">
+            <a href="#project-docs">Project Docs</a>
+
+            <div class="dropdown">
+                <span>Architecture Design ▾</span>
+                <div class="dropdown-content">
+                    <a href="#crc">CRC Cards</a>
+                    <a href="#sequence">Sequence Diagrams</a>
+                    <a href="#class">Class Diagrams</a>
+                </div>
+            </div>
+
+            <a href="#planning">Planning</a>
+
+            <div class="dropdown">
+                <span>Requirements ▾</span>
+                <div class="dropdown-content">
+                    <a href="#interviews">Interview Questions</a>
+                    <a href="#mapping">Requirements Mapping</a>
+                </div>
+            </div>
+
+            <a href="#attributions">Attributions</a>
+        </nav>
+
+        <h1>Assessment 2 Deliverables</h1>
+
+        <section id="project-docs"><h2>Project Docs</h2></section>
+        <section id="crc"><h2>CRC Cards</h2></section>
+        <section id="sequence"><h2>Sequence Diagrams</h2></section>
+        <section id="class"><h2>Class Diagrams</h2></section>
+        <section id="planning"><h2>Planning</h2></section>
+        <section id="interviews"><h2>Interview Questions</h2></section>
+        <section id="mapping"><h2>Requirements Mapping</h2></section>
+        <section id="attributions"><h2>Attributions</h2></section>
+
+        <a class="access-link return-home" href="/"><h2>Return Home</h2></a>
+
+    </div>
+</div>
+</body>
+</html>
