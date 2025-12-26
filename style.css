@@ -19,7 +19,7 @@ hr {
 .content {
     display: flex;
     min-height: 100vh;
-    flex-direction: column;   /* ONE COLUMN */
+    flex-direction: column;
 }
 
 .page-split {
@@ -101,11 +101,6 @@ hr {
     .access-link { font-size: smaller; }
 }
 
-/* =========================================================
-   TOP TABS STYLES (used by your new homepage layout)
-   Only affects pages that include .topbar/.tabs/.card classes
-   ========================================================= */
-
 .topbar {
     background: white;
     border-bottom: 1px solid rgba(0,0,0,0.12);
@@ -172,10 +167,8 @@ hr {
 
 .dropdown{ position: relative; }
 
-/* Show the first dropdown on hover (keeps it simple) */
 .dropdown:hover > .dropdown-menu{ display:flex; }
 
-/* First dropdown: horizontal row */
 .dropdown-menu{
   display:none;
   position:absolute;
@@ -195,7 +188,6 @@ hr {
   min-width: 520px;
 }
 
-/* Columns inside the dropdown */
 .dropdown-menu > a,
 .dropdown-sub{
   background: #fafafe;
@@ -205,7 +197,6 @@ hr {
   min-width: 170px;
 }
 
-/* Links style */
 .dropdown-menu a{
   display:block;
   padding:10px 12px;
@@ -218,7 +209,6 @@ hr {
   background: rgba(138,43,226,0.12);
 }
 
-/* Architecture button (click-to-open submenu using focus) */
 .submenu-title{
   background: none;
   border: none;
@@ -235,7 +225,6 @@ hr {
   background: rgba(138,43,226,0.12);
 }
 
-/* Submenu hidden unless Architecture is clicked (focus) */
 .dropdown-sub{ position: relative; }
 .sub-menu{
   display:none;
@@ -256,7 +245,6 @@ hr {
   position: relative;
 }
 
-/* Hide submenu by default */
 .sub-menu{
   display: none;
 }
