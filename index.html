@@ -1,95 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="style.css">
-    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
-    <title>QUACK? | Overview</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUACK? | Overview</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
 </head>
 <body>
-<header class="topbar">
-    <div class="topbar-inner">
-        <div>
-            <h1 class="site-title">QUACK?</h1>
-            <p class="site-subtitle">ENG1 Project - Cohort 4 Team 6</p>
-        </div>
-    </div>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="site-title">QUACK?</div>
+    <div class="site-subtitle">ENG1 Project - Cohort 4 Team 6</div>
+  </div>
 
-    <nav class="tabs">
-        <a class="tab active" href="index.html">Overview</a>
-        <a class="tab" href="./QUACK.jar">Download</a>
-        <a class="tab" href="/plan-snapshots">Plan Snapshots</a>
-        <a class="tab" href="/interim-uml-diagrams">UML Diagrams</a>
-        <a class="tab" href="/link-to-deliverables">Assessment 1</a>
+  <nav class="tabs">
+    <a class="tab" href="index.html">Overview</a>
+    <a class="tab" href="QUACK.jar">Download</a>
+    <a class="tab" href="plan-snapshots/index.html">Plan Snapshots</a>
+    <a class="tab" href="interim-uml-diagrams/index.html">UML Diagrams</a>
+    <a class="tab" href="link-to-deliverables/index.html">Assessment 1</a>
 
-        <div class="tab-row-break">
-            <div class="tab dropdown">
-                <a class="tab-link" href="/assessment-2-deliverables">Assessment 2 ▼</a>
-                <div class="dropdown-menu">
-
-                    <div class="dropdown-sub">
-                        <button class="submenu-title" type="button" tabindex="0">
-                            Architecture Design ▶
-                        </button>
-
-                        <div class="dropdown-menu sub-menu">
-                        <a href="/crc.html">CRC cards</a>
-                            <a href="/crcReferences.html">CRC to requirements map</a>
-                            <a href="/sequence-diagrams.html">Sequence Diagrams</a>
-                            <a href="/class-diagrams.html">Class Diagrams</a>
-                        </div>
-                    </div>
-
-
-                    <a href="/progressPlan.html">Planning</a>
-                    <a href="/interviewQuestions.html">Requirements</a>
-                    <a href="/attributions.html">Attributions</a>
-                </div>
+    <div class="tab-row-break">
+      <div class="tab dropdown">
+        <a class="tab-link" href="assessment-2-deliverables/index.html">Assessment 2 ▼</a>
+        <div class="dropdown-menu">
+          <div class="dropdown-sub">
+            <button class="submenu-title" type="button" tabindex="0">Architecture Design ▶</button>
+            <div class="dropdown-menu sub-menu">
+              <a href="assessment-2-deliverables/index.html#crc">CRC cards</a>
+              <a href="assessment-2-deliverables/index.html#crc-map">CRC to requirements map</a>
+              <a href="assessment-2-deliverables/index.html#sequence">Sequence Diagrams</a>
+              <a href="assessment-2-deliverables/index.html#class">Class Diagrams</a>
             </div>
+          </div>
+          <a href="assessment-2-deliverables/index.html#planning">Planning</a>
+          <a href="assessment-2-deliverables/index.html#requirements">Requirements</a>
+          <a href="assessment-2-deliverables/index.html#attributions">Attributions</a>
         </div>
-    </nav>
-</header>
-
+      </div>
+    </div>
+  </nav>
+</div>
 <main class="page">
-    <section class="card">
-        <h2>Overview</h2>
-        <p>
-            <b>QUACK?</b> is a campus-themed adventure game developed in <b>Java</b> using <b>libGDX</b>.
+  <section class="card">
+  <h2>Overview</h2>
+  <p>
+<b>QUACK?</b> is a campus-themed adventure game developed in <b>Java</b> using <b>libGDX</b>.
             Players explore the university environment, manage limited time, and collect Duck Statue pieces
             to escape successfully.
         </p>
-
-        <h3>Game Objective</h3>
-        <ul>
-            <li>Collect all <b>Duck Statue pieces</b> across the campus.</li>
-            <li>Finish before the <b>timer</b> reaches zero.</li>
-            <li>Final score is influenced by objectives and <b>time remaining</b>.</li>
-        </ul>
-
-        <h3>Controls</h3>
-        <ul>
-            <li><b>Move:</b> WASD or Arrow Keys</li>
-            <li><b>Pause:</b> P</li>
-            <li><b>Instructions:</b> I</li>
-            <li><b>Music toggle:</b> M</li>
-            <li><b>Confirm / Continue:</b> Enter</li>
-        </ul>
-
-        <h3>Repositories</h3>
-        <ul>
-            <li><a target="_blank" href="https://github.com/WHALES-ENG1/WHALES-Game">WHALES-Game</a></li>
-            <li><a target="_blank" href="https://github.com/Lordimass/WHALES-Website">WHALES-Website</a></li>
-            <li><a target="_blank" href="https://github.com/WHALES-ENG1/WHALES-Assets">WHALES-Assets</a></li>
-        </ul>
-
-        <p class="smaller" style="margin-top:16px;">
+  <h3>Game Objective</h3>
+  <ul>
+<li>Collect all <b>Duck Statue pieces</b> across the campus.</li>
+<li>Finish before the <b>timer</b> reaches zero.</li>
+<li>Final score is influenced by objectives and <b>time remaining</b>.</li>
+</ul>
+  <h3>Controls</h3>
+  <ul>
+<li><b>Move:</b> WASD or Arrow Keys</li>
+<li><b>Pause:</b> P</li>
+<li><b>Instructions:</b> I</li>
+<li><b>Music toggle:</b> M</li>
+<li><b>Confirm / Continue:</b> Enter</li>
+</ul>
+  <h3>Repositories</h3>
+  <ul>
+<li><a href="https://github.com/WHALES-ENG1/WHALES-Game" target="_blank">WHALES-Game</a></li>
+<li><a href="https://github.com/Lordimass/WHALES-Website" target="_blank">WHALES-Website</a></li>
+<li><a href="https://github.com/WHALES-ENG1/WHALES-Assets" target="_blank">WHALES-Assets</a></li>
+</ul>
+  <p class="smaller" style="margin-top:16px;">
             Uicons by <a href="https://www.flaticon.com/uicons" target="_blank">Flaticon</a> •
-            Licensed under <a href="/LICENSE.txt" target="_blank">The Unlicense</a>
-        </p>
-    </section>
+            Licensed under <a href="LICENSE.txt" target="_blank">The Unlicense</a>
+</p>
+  </section>
 </main>
-
 </body>
 </html>
