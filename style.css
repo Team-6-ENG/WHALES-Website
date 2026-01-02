@@ -53,13 +53,14 @@ hr {
     border-radius: 12px;
     padding: 16px;
 
-    align-items: center;
+    align-items: left;
     justify-content: center;
 
-    background-color: blueviolet;
-    color: white;
+    background-color: #ececf7;
+    color: blueviolet;
     text-decoration: none;
-
+    border-style: solid;
+    border-color: darkgray;
     box-shadow: 0 10px 20px rgba(0,0,0,0.12);
     transition: transform 120ms ease, filter 120ms ease;
 }
@@ -72,10 +73,6 @@ hr {
 .access-link i {
     font-size: x-large;
     max-height: 1em;
-}
-
-.repo-link {
-    background-color: darkolivegreen;
 }
 
 .centre-content {
@@ -124,7 +121,7 @@ hr {
 }
 
 .tabs {
-    max-width: 1000px;
+    max-width: 90%;
     margin: 0 auto;
     padding: 10px 16px 16px;
     display: flex;
@@ -151,7 +148,7 @@ hr {
 }
 
 .page {
-    max-width: 1000px;
+    max-width: 90%;
     margin: 0 auto;
     padding: 20px 16px 40px;
 }
@@ -163,7 +160,6 @@ hr {
     border: 1px solid rgba(0,0,0,0.1);
     box-shadow: 0 10px 24px rgba(0,0,0,0.10);
 }
-.tabs{ position: relative; z-index: 1000; }
 
 .dropdown{ position: relative; }
 
@@ -290,4 +286,8 @@ hr {
   left: 12px;
   top: 12px;
   z-index: 2000;
+}
+
+a{
+  color: blueviolet;
 }
