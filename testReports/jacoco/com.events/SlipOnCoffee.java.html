@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlipOnCoffee.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.events</a> &gt; <span class="el_source">SlipOnCoffee.java</span></div><h1>SlipOnCoffee.java</h1><pre class="source lang-java linenums">package com.events;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.characters.Player;
+
+/**
+ * Slip on coffee negative event .
+ *
+ * @author Wasif Mustafa A coffee causes the player to slip when stepped on
+ */
+public class SlipOnCoffee extends Obstacle {
+  // Changed: store path in constant for testing
+  public static final String IMG = &quot;items/Coffee.png&quot;;
+<span class="fc" id="L17">  public final float duration = 1f; // length of slip</span>
+  private final Texture coffeeTexture;
+<span class="fc" id="L19">  private boolean triggered = false;</span>
+<span class="fc" id="L20">  private boolean active = false;</span>
+<span class="fc" id="L21">  private float timer = 0;</span>
+  private Vector2 slipDirection;
+
+  /** Constructor. */
+  public SlipOnCoffee(float x, float y, float width, float height) {
+<span class="fc" id="L26">    super(x, y, width, height);</span>
+<span class="fc" id="L27">    coffeeTexture = new Texture(Gdx.files.internal(IMG));</span>
+<span class="fc" id="L28">  }</span>
+
+  /** Called each frame to update the slip state. */
+  public void update(float delta, Player player, String currentRoom, String targetRoom) {
+
+<span class="fc" id="L33">    timer += delta;</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">    if (!currentRoom.equals(targetRoom)) {</span>
+<span class="fc" id="L35">      reset();</span>
+<span class="fc" id="L36">      return;</span>
+    }
+<span class="fc bfc" id="L38" title="All 2 branches covered.">    if (!active) {</span>
+<span class="fc" id="L39">      return;</span>
+    }
+
+<span class="fc bfc" id="L42" title="All 2 branches covered.">    if (timer &lt; duration) {</span>
+<span class="fc" id="L43">      player.move(</span>
+          slipDirection.x * delta * 4f,
+          slipDirection.y * delta * 4f); // multiplier controls speed of slip
+
+<span class="fc" id="L47">      player.setRotation(player.getRotation() + (360 * delta));</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    } else if (timer &gt;= duration * 2) {</span>
+
+      // Slip finished
+<span class="fc" id="L51">      reset();</span>
+<span class="fc" id="L52">      player.setRotation(0f);</span>
+    }
+<span class="fc" id="L54">  }</span>
+
+  /** Call to trigger event. */
+  public void trigger() {
+
+<span class="fc bfc" id="L59" title="All 2 branches covered.">    if (!triggered) {</span>
+<span class="fc" id="L60">      triggered = true;</span>
+<span class="fc" id="L61">      Event.incrementNegativeEventCounter();</span>
+    }
+<span class="fc bfc" id="L63" title="All 2 branches covered.">    if (!active) {</span>
+<span class="fc" id="L64">      active = true;</span>
+<span class="fc" id="L65">      timer = 0;</span>
+<span class="fc" id="L66">      slipDirection = new Vector2((float) Math.random() - 0.5f, (float) Math.random() - 0.5f).nor();</span>
+    }
+<span class="fc" id="L68">  }</span>
+
+  /** Render coffee. */
+  @Override
+  public void render(SpriteBatch batch) {
+<span class="nc" id="L73">    batch.draw(coffeeTexture, getBounds().x, getBounds().y, getBounds().width, getBounds().height);</span>
+<span class="nc" id="L74">  }</span>
+
+  /** Reset once room is left. */
+  public void reset() {
+<span class="fc" id="L78">    active = false;</span>
+<span class="fc" id="L79">  }</span>
+
+  /**
+   * If event is active.
+   *
+   * @return returns if event has been triggered
+   */
+  public boolean isActive() {
+<span class="fc" id="L87">    return active;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

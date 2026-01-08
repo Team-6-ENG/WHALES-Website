@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AudioManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.audio</a> &gt; <span class="el_source">AudioManager.java</span></div><h1>AudioManager.java</h1><pre class="source lang-java linenums">package com.audio;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
+
+/** Added 24.11.25 for testability and encapsulation. */
+public class AudioManager {
+  static final String MUSIC = &quot;sounds/background-music.mp3&quot;;
+  static final String COFFEE = &quot;sounds/goofy-slip.mp3&quot;;
+  static final String DRINKING = &quot;sounds/drinking-sound.mp3&quot;;
+  static final String COLLECT = &quot;sounds/pick-up-sound.mp3&quot;;
+  static final String WIND = &quot;sounds/wind-sound.mp3&quot;;
+  static final String POWER_CUT = &quot;sounds/power-cut.mp3&quot;;
+  static final String SWIPE_SOUND = &quot;sounds/swipe.mp3&quot;;
+  static final String FROG_SOUND = &quot;sounds/frog.mp3&quot;;
+  static final String GULP = &quot;sounds/gulp.mp3&quot;;
+  private final Music music;
+  private final Sound coffee;
+  private final Sound drinking;
+  private final Sound collectItem;
+  private final Sound wind;
+  private final Sound powerCut;
+  private final Sound swipe;
+  private final Sound frog;
+  private final Sound gulp;
+<span class="fc" id="L27">  private long windId = 0;</span>
+  // Change [17/12/2025] - Store volume level (0.0 to 1.0) for volume control
+<span class="fc" id="L29">  private float volume = 0.7f;</span>
+<span class="fc" id="L30">  private float musicVolume = 0.5f;</span>
+<span class="fc" id="L31">  private float preMuteVolume = volume;</span>
+<span class="fc" id="L32">  private float preMuteMusicVolume = musicVolume;</span>
+
+  /** Controls sounds and volume of the game. */
+<span class="fc" id="L35">  public AudioManager() {</span>
+<span class="fc" id="L36">    music = Gdx.audio.newMusic(Gdx.files.internal(MUSIC));</span>
+    // Change [17/12/2025] - Set initial volume
+<span class="fc" id="L38">    music.setVolume(musicVolume);</span>
+<span class="fc" id="L39">    coffee = Gdx.audio.newSound(Gdx.files.internal(COFFEE));</span>
+<span class="fc" id="L40">    drinking = Gdx.audio.newSound(Gdx.files.internal(DRINKING));</span>
+<span class="fc" id="L41">    collectItem = Gdx.audio.newSound(Gdx.files.internal(COLLECT));</span>
+<span class="fc" id="L42">    wind = Gdx.audio.newSound(Gdx.files.internal(WIND));</span>
+<span class="fc" id="L43">    powerCut = Gdx.audio.newSound(Gdx.files.internal(POWER_CUT));</span>
+<span class="fc" id="L44">    frog = Gdx.audio.newSound(Gdx.files.internal(FROG_SOUND));</span>
+<span class="fc" id="L45">    gulp = Gdx.audio.newSound(Gdx.files.internal(GULP));</span>
+<span class="fc" id="L46">    swipe = Gdx.audio.newSound(Gdx.files.internal(SWIPE_SOUND));</span>
+<span class="fc" id="L47">  }</span>
+
+  /** Start game music on loop. */
+  public void playMusic() {
+<span class="fc" id="L51">    music.play();</span>
+<span class="fc" id="L52">    music.setLooping(true);</span>
+<span class="fc" id="L53">  }</span>
+
+  /** Play coffee slip sound. */
+  public void playCoffee() {
+<span class="fc" id="L57">    coffee.play(volume);</span>
+<span class="fc" id="L58">  }</span>
+
+  /** Play drinking sound. */
+  public void playDrinking() {
+<span class="fc" id="L62">    drinking.play(volume);</span>
+<span class="fc" id="L63">  }</span>
+
+  /** Play item collection sound. */
+  public void playCollectItem() {
+<span class="nc" id="L67">    collectItem.play(volume);</span>
+<span class="nc" id="L68">  }</span>
+
+  /** Play frog croak sound. */
+  public void playFrogSound() {
+<span class="nc" id="L72">    frog.play(volume);</span>
+<span class="nc" id="L73">  }</span>
+
+  /** Play frog gulp sound. */
+  public void playGulp() {
+<span class="nc" id="L77">    gulp.play(volume * 4);</span>
+<span class="nc" id="L78">  }</span>
+
+  /** Start wind sound on loop. */
+  public void playWind() {
+<span class="fc" id="L82">    windId = wind.loop(volume);</span>
+<span class="fc" id="L83">  }</span>
+
+  /** Stop wind sound. */
+  public void stopWind() {
+<span class="fc" id="L87">    wind.stop();</span>
+<span class="fc" id="L88">    windId = 0;</span>
+<span class="fc" id="L89">  }</span>
+
+  /** Play power cut sound. */
+  public void playPowerCut() {
+<span class="fc" id="L93">    powerCut.play(volume);</span>
+<span class="fc" id="L94">  }</span>
+
+  /** Play swipe sound. */
+  public void playSwipe() {
+<span class="nc" id="L98">    swipe.play(volume);</span>
+<span class="nc" id="L99">  }</span>
+
+  /** Stop game music. */
+  public void stopMusic() {
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">    if (music.isPlaying()) {</span>
+<span class="nc" id="L104">      music.stop();</span>
+    }
+<span class="fc" id="L106">  }</span>
+
+  /** Mute and unmute all game sounds. */
+  public void toggleMute() {
+<span class="pc bpc" id="L110" title="1 of 4 branches missed.">    if (volume != 0 || musicVolume != 0) {</span>
+<span class="fc" id="L111">      preMuteVolume = volume;</span>
+<span class="fc" id="L112">      preMuteMusicVolume = musicVolume;</span>
+<span class="fc" id="L113">      setMusicVolume(0);</span>
+<span class="fc" id="L114">      setVolume(0);</span>
+    } else {
+<span class="fc" id="L116">      setVolume(preMuteVolume);</span>
+<span class="fc" id="L117">      setMusicVolume(preMuteMusicVolume);</span>
+    }
+<span class="fc" id="L119">  }</span>
+
+  /**
+   * Check is music is currently playing.
+   *
+   * @return true if playing, else false
+   */
+  public boolean musicIsPlaying() {
+<span class="fc" id="L127">    return music.isPlaying();</span>
+  }
+
+  /**
+   * Get game sound volume.
+   *
+   * @return game volume
+   */
+  public float getVolume() {
+<span class="fc" id="L136">    return volume;</span>
+  }
+
+  /**
+   * Set game sound volume.
+   *
+   * @param volume volume value between 0 and 1
+   */
+  public void setVolume(float volume) {
+<span class="fc" id="L145">    this.volume = Math.max(0.0f, Math.min(1.0f, volume)); // Clamp between 0.0 and 1.0</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">    if (windId != 0) {</span>
+<span class="nc" id="L147">      wind.setVolume(windId, this.volume);</span>
+    }
+<span class="fc" id="L149">  }</span>
+
+  /**
+   * Get music volume.
+   *
+   * @return music volume between 0 and 1
+   */
+  public float getMusicVolume() {
+<span class="nc" id="L157">    return musicVolume;</span>
+  }
+
+  /**
+   * Set music volume.
+   *
+   * @param volume value between 0 and 1
+   */
+  public void setMusicVolume(float volume) {
+<span class="fc" id="L166">    this.musicVolume = Math.max(0.0f, Math.min(1.0f, volume));</span>
+<span class="fc" id="L167">    music.setVolume(this.musicVolume);</span>
+<span class="fc" id="L168">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

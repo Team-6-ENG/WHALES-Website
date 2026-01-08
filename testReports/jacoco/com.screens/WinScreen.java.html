@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WinScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.screens</a> &gt; <span class="el_source">WinScreen.java</span></div><h1>WinScreen.java</h1><pre class="source lang-java linenums">package com.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.mazegame.Main;
+
+/** Displays the WinScreen. */
+public class WinScreen extends ScreenAdapter {
+  // Changed: store path in constant for testing
+  public static final String IMG = &quot;screens/WinningScreen.png&quot;;
+  private static final float LEADERBOARD_BUTTON_ORIGINAL_WIDTH = 180f;
+  private static final float LEADERBOARD_BUTTON_ORIGINAL_HEIGHT = 50f;
+  private static final float ACHIEVEMENTS_BUTTON_ORIGINAL_WIDTH = 180f;
+  private static final float ACHIEVEMENTS_BUTTON_ORIGINAL_HEIGHT = 50f;
+  private final Main game;
+  private final double timeLeft;
+  private final int totalScore;
+  private final LeaderboardManager leaderboardManager;
+  private final AchievementManager achievementManager;
+  private Texture winningScreen;
+  private Label timeLabel;
+  private Label scoreLabel;
+<span class="fc" id="L31">  private boolean scoreSaved = false;</span>
+  private Stage stage;
+  private TextButton leaderboardButton;
+  private TextButton achievementsButton;
+  private TextButton returnButton;
+  private Label achievementsLabel;
+
+  /**Constructor.*/
+<span class="fc" id="L39">  public WinScreen(Main game, double timeLeft, int totalScore) {</span>
+<span class="fc" id="L40">    this.game = game;</span>
+<span class="fc" id="L41">    this.timeLeft = timeLeft;</span>
+<span class="fc" id="L42">    this.totalScore = totalScore;</span>
+<span class="fc" id="L43">    this.leaderboardManager = new LeaderboardManager();</span>
+    // Change [01/01/2026] - Initialize AchievementManager
+<span class="fc" id="L45">    this.achievementManager = new AchievementManager();</span>
+<span class="fc" id="L46">  }</span>
+
+  /** Loads the Winning Screen PNG Font Setting. */
+  @Override
+  public void show() {
+<span class="nc bnc" id="L51" title="All 2 branches missed.">    if (!scoreSaved) {</span>
+      // Change [04/01/2026] - Use player name when saving score
+<span class="nc" id="L53">      String playerName = game.getPlayerName();</span>
+<span class="nc" id="L54">      leaderboardManager.addScore(totalScore, (float) timeLeft, playerName);</span>
+<span class="nc" id="L55">      scoreSaved = true;</span>
+    }
+
+<span class="nc" id="L58">    winningScreen = new Texture(IMG);</span>
+<span class="nc" id="L59">    timeLabel = new Label(&quot;Time Remaining: &quot;, Main.labelStyle);</span>
+<span class="nc" id="L60">    timeLabel.setFontScale(0.05f);</span>
+<span class="nc" id="L61">    timeLabel.setPosition(5, (Main.WORLD_HEIGHT / 2f) + 2);</span>
+
+<span class="nc" id="L63">    scoreLabel = new Label(&quot;Score: &quot;, Main.labelStyle);</span>
+<span class="nc" id="L64">    scoreLabel.setFontScale(0.05f);</span>
+<span class="nc" id="L65">    scoreLabel.setPosition(5, (Main.WORLD_HEIGHT / 2f));</span>
+
+    // Change [01/01/2026] - Display achievements summary
+<span class="nc" id="L68">    int unlockedCount = 0;</span>
+<span class="nc bnc" id="L69" title="All 2 branches missed.">    for (Achievement achievement : achievementManager.getAllAchievements()) {</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">      if (achievement.unlocked) {</span>
+<span class="nc" id="L71">        unlockedCount++;</span>
+      }
+<span class="nc" id="L73">    }</span>
+<span class="nc" id="L74">    achievementsLabel =</span>
+        new Label(&quot;Achievements Unlocked: &quot; + unlockedCount + &quot;/4&quot;, Main.labelStyle);
+<span class="nc" id="L76">    achievementsLabel.setFontScale(0.05f);</span>
+<span class="nc" id="L77">    achievementsLabel.setPosition(5, (Main.WORLD_HEIGHT / 2f) - 2);</span>
+
+<span class="nc" id="L79">    stage = new Stage(new ScreenViewport());</span>
+<span class="nc" id="L80">    Gdx.input.setInputProcessor(stage);</span>
+
+<span class="nc" id="L82">    leaderboardButton = new TextButton(&quot;Leaderboard&quot;, Main.uiSkin);</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">    if (leaderboardButton.getLabel() != null) {</span>
+<span class="nc" id="L84">      leaderboardButton.getLabel().setFontScale(1.2f);</span>
+    }
+
+<span class="nc" id="L87">    leaderboardButton.addListener(</span>
+<span class="nc" id="L88">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L91">            game.setScreen(new LeaderboardScreen(game, WinScreen.this));</span>
+<span class="nc" id="L92">          }</span>
+        });
+
+<span class="nc" id="L95">    stage.addActor(leaderboardButton);</span>
+
+    // Change [01/01/2026] - Create Achievements button
+<span class="nc" id="L98">    achievementsButton = new TextButton(&quot;Achievements&quot;, Main.uiSkin);</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    if (achievementsButton.getLabel() != null) {</span>
+<span class="nc" id="L100">      achievementsButton.getLabel().setFontScale(1.2f);</span>
+    }
+
+<span class="nc" id="L103">    achievementsButton.addListener(</span>
+<span class="nc" id="L104">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L107">            game.setScreen(new AchievementScreen(game, WinScreen.this));</span>
+<span class="nc" id="L108">          }</span>
+        });
+
+<span class="nc" id="L111">    stage.addActor(achievementsButton);</span>
+
+<span class="nc" id="L113">    returnButton = new TextButton(&quot;Return&quot;, Main.uiSkin);</span>
+<span class="nc" id="L114">    returnButton.addListener(</span>
+<span class="nc" id="L115">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L118">            game.resetGame();</span>
+<span class="nc" id="L119">            game.setScreen(new HomeScreen(game));</span>
+<span class="nc" id="L120">          }</span>
+        });
+<span class="nc" id="L122">    stage.addActor(returnButton);</span>
+
+<span class="nc" id="L124">    updateButtonPositions(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());</span>
+<span class="nc" id="L125">  }</span>
+
+  /** Displays the Winning Screen. */
+  @Override
+  public void render(float delta) {
+<span class="nc" id="L130">    Gdx.gl.glClearColor(0, 0, 0, 1);</span>
+<span class="nc" id="L131">    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);</span>
+
+<span class="nc" id="L133">    game.getViewport().apply();</span>
+<span class="nc" id="L134">    SpriteBatch batch = game.getBatch();</span>
+<span class="nc" id="L135">    batch.setProjectionMatrix(game.getViewport().getCamera().combined);</span>
+<span class="nc" id="L136">    batch.begin();</span>
+<span class="nc" id="L137">    batch.draw(</span>
+        winningScreen,
+        0,
+        0,
+<span class="nc" id="L141">        game.getViewport().getWorldWidth(),</span>
+<span class="nc" id="L142">        game.getViewport().getWorldHeight());</span>
+    // displays time remaining in minutes and seconds
+<span class="nc" id="L144">    timeLabel.setText(</span>
+<span class="nc" id="L145">        String.format(&quot;Time Remaining: %02d:%02d&quot;, (int) timeLeft / 60, (int) timeLeft % 60));</span>
+<span class="nc" id="L146">    timeLabel.draw(batch, 1f);</span>
+
+<span class="nc" id="L148">    scoreLabel.setText(String.format(&quot;Score: %d&quot;, totalScore));</span>
+<span class="nc" id="L149">    scoreLabel.draw(batch, 1f);</span>
+
+    // Change [01/01/2026] - Draw achievements label
+<span class="nc bnc" id="L152" title="All 2 branches missed.">    if (achievementsLabel != null) {</span>
+<span class="nc" id="L153">      achievementsLabel.draw(batch, 1f);</span>
+    }
+
+<span class="nc" id="L156">    batch.end();</span>
+
+<span class="nc bnc" id="L158" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L159">      stage.act(delta);</span>
+<span class="nc" id="L160">      stage.draw();</span>
+    }
+<span class="nc" id="L162">  }</span>
+
+  @Override
+  public void resize(int width, int height) {
+<span class="nc bnc" id="L166" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L167">      stage.getViewport().update(width, height, true);</span>
+<span class="nc" id="L168">      updateButtonPositions(width, height);</span>
+    }
+<span class="nc" id="L170">  }</span>
+
+  // Change [21/12/2025] - Added button position update method
+  // Change [01/01/2026] - Updated to include achievements button
+  private void updateButtonPositions(float screenWidth, float screenHeight) {
+    // Calculate scale factors based on screen size relative to original viewport size
+<span class="nc" id="L176">    float scaleX = screenWidth / Main.VIEWPORT_SIZE.x;</span>
+<span class="nc" id="L177">    float scaleY = screenHeight / Main.VIEWPORT_SIZE.y;</span>
+<span class="nc" id="L178">    float fontScale = (scaleX + scaleY) / 2f;</span>
+
+<span class="nc bnc" id="L180" title="All 2 branches missed.">    if (leaderboardButton != null) {</span>
+      // Update button size proportionally
+<span class="nc" id="L182">      leaderboardButton.setSize(</span>
+          LEADERBOARD_BUTTON_ORIGINAL_WIDTH * scaleX, LEADERBOARD_BUTTON_ORIGINAL_HEIGHT * scaleY);
+
+      // Update font scale
+<span class="nc bnc" id="L186" title="All 2 branches missed.">      if (leaderboardButton.getLabel() != null) {</span>
+<span class="nc" id="L187">        leaderboardButton.getLabel().setFontScale(fontScale);</span>
+      }
+
+<span class="nc" id="L190">      float relativeX = 0.5f;</span>
+<span class="nc" id="L191">      float relativeY = 0.25f;</span>
+<span class="nc" id="L192">      leaderboardButton.setPosition(</span>
+<span class="nc" id="L193">          screenWidth * relativeX - leaderboardButton.getWidth() - 2, screenHeight * relativeY);</span>
+    }
+
+    // Change [01/01/2026] - Update achievements button position
+<span class="nc bnc" id="L197" title="All 2 branches missed.">    if (achievementsButton != null) {</span>
+<span class="nc" id="L198">      achievementsButton.setSize(</span>
+          ACHIEVEMENTS_BUTTON_ORIGINAL_WIDTH * scaleX,
+          ACHIEVEMENTS_BUTTON_ORIGINAL_HEIGHT * scaleY);
+
+<span class="nc bnc" id="L202" title="All 2 branches missed.">      if (achievementsButton.getLabel() != null) {</span>
+<span class="nc" id="L203">        achievementsButton.getLabel().setFontScale(fontScale);</span>
+      }
+
+<span class="nc" id="L206">      float relativeX = 0.5f;</span>
+<span class="nc" id="L207">      float relativeY = 0.25f;</span>
+<span class="nc" id="L208">      achievementsButton.setPosition(screenWidth * relativeX + 2, screenHeight * relativeY);</span>
+    }
+
+<span class="nc bnc" id="L211" title="All 2 branches missed.">    if (returnButton != null) {</span>
+<span class="nc" id="L212">      returnButton.setSize(</span>
+          ((ACHIEVEMENTS_BUTTON_ORIGINAL_WIDTH * 2) + 4) * scaleX,
+          ACHIEVEMENTS_BUTTON_ORIGINAL_HEIGHT * scaleY);
+<span class="nc bnc" id="L215" title="All 2 branches missed.">      if (returnButton.getLabel() != null) {</span>
+<span class="nc" id="L216">        returnButton.getLabel().setFontScale(fontScale);</span>
+      }
+<span class="nc" id="L218">      float relativeX = 0.5f;</span>
+<span class="nc" id="L219">      float relativeY = 0.12f;</span>
+<span class="nc" id="L220">      returnButton.setPosition(</span>
+<span class="nc" id="L221">          screenWidth * relativeX - returnButton.getWidth() / 2f, screenHeight * relativeY);</span>
+    }
+<span class="nc" id="L223">  }</span>
+
+  @Override
+  public void dispose() {
+<span class="nc bnc" id="L227" title="All 2 branches missed.">    if (winningScreen != null) {</span>
+<span class="nc" id="L228">      winningScreen.dispose();</span>
+    }
+<span class="nc bnc" id="L230" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L231">      stage.dispose();</span>
+    }
+<span class="nc" id="L233">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

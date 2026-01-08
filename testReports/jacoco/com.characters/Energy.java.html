@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Energy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.characters</a> &gt; <span class="el_source">Energy.java</span></div><h1>Energy.java</h1><pre class="source lang-java linenums">package com.characters;
+
+import static com.badlogic.mazegame.Main.labelStyle;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
+/** Represents the energy which allows the player to sprint. */
+public class Energy {
+  private static final String labelFormatString = &quot;Energy:%02d/%d&quot;;
+
+  /** The maximum energy. */
+  public final float maxEnergy;
+
+  /** The rate at which energy is regenerated (energy/second). */
+<span class="fc" id="L17">  public final float regenerationRate = 1;</span>
+
+  private final Label label;
+
+  /** Whether the energy is currently regenerating. */
+<span class="fc" id="L22">  public boolean regenerating = true;</span>
+
+  /** The current energy level. */
+  private float currentEnergy;
+
+  /** Whether energy can be used currently. */
+<span class="fc" id="L28">  private boolean accessible = true;</span>
+
+  private float energyTickTimer;
+
+  /**
+   * Create a new energy bar.
+   *
+   * @param maxEnergy The maximum energy
+   */
+<span class="fc" id="L37">  Energy(float maxEnergy) {</span>
+<span class="fc" id="L38">    this.maxEnergy = maxEnergy;</span>
+<span class="fc" id="L39">    currentEnergy = maxEnergy / 2f;</span>
+
+<span class="fc" id="L41">    label = createLabel();</span>
+<span class="fc" id="L42">  }</span>
+
+  /**
+   * Initialise text label. Changed 06/12/25 Moved out of constructor for testing
+   *
+   * @return text label
+   */
+  protected Label createLabel() {
+<span class="nc" id="L50">    Label l =</span>
+        new Label(
+<span class="nc" id="L52">            String.format(labelFormatString, Math.round(currentEnergy), Math.round(maxEnergy)),</span>
+            labelStyle);
+<span class="nc" id="L54">    l.setPosition(0.5f, -4);</span>
+<span class="nc" id="L55">    l.setFontScale(0.03f);</span>
+
+<span class="nc" id="L57">    return l;</span>
+  }
+
+  /**
+   * Get amount of energy remaining.
+   *
+   * @return &lt;code&gt;currentEnergy&lt;/code&gt;
+   */
+  public float getCurrentEnergy() {
+<span class="fc" id="L66">    return currentEnergy;</span>
+  }
+
+  /**
+   * Reduce energy by &lt;code&gt;amount&lt;/code&gt;.
+   *
+   * @param amount The amount to reduce the energy by.
+   */
+  public void reduceEnergy(float amount) {
+<span class="fc bfc" id="L75" title="All 2 branches covered.">    if (amount &lt; 0) {</span>
+<span class="fc" id="L76">      throw new IllegalArgumentException(</span>
+          &quot;Cannot reduce by a negative amount, use `increaseEnergy` instead&quot;);
+    }
+<span class="fc" id="L79">    currentEnergy = Math.max(currentEnergy - amount, 0);</span>
+<span class="fc" id="L80">    label.setText(</span>
+<span class="fc" id="L81">        String.format(labelFormatString, Math.round(currentEnergy), Math.round(maxEnergy)));</span>
+
+    // Block access to energy if it gets entirely depleted, until it's fully replenished again.
+<span class="fc bfc" id="L84" title="All 2 branches covered.">    if (currentEnergy == 0f) {</span>
+<span class="fc" id="L85">      accessible = false;</span>
+    }
+<span class="fc" id="L87">  }</span>
+
+  /**
+   * Increase energy by &lt;code&gt;amount&lt;/code&gt;.
+   *
+   * @param amount The amount to reduce the energy by.
+   */
+  public void increaseEnergy(float amount) {
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (amount &lt; 0) {</span>
+<span class="fc" id="L96">      throw new IllegalArgumentException(</span>
+          &quot;Cannot increase by a negative amount, use `decreaseEnergy` instead&quot;);
+    }
+<span class="fc" id="L99">    currentEnergy = Math.min(currentEnergy + amount, maxEnergy);</span>
+<span class="fc" id="L100">    label.setText(</span>
+<span class="fc" id="L101">        String.format(labelFormatString, Math.round(currentEnergy), Math.round(maxEnergy)));</span>
+
+    // Re-enable access to energy when it's fully restored
+<span class="pc bpc" id="L104" title="1 of 2 branches missed.">    if (currentEnergy &gt;= 1) {</span>
+<span class="fc" id="L105">      accessible = true;</span>
+    }
+<span class="fc" id="L107">  }</span>
+
+  /**
+   * Check if energy can be used.
+   *
+   * @return Whether energy can be used currently
+   */
+  public boolean isAccessible() {
+<span class="fc" id="L115">    return accessible;</span>
+  }
+
+  /** Update the energy, regenerating it based on delta time. */
+  public void tick(float delta) {
+    // Regenerate energy if enabled.
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    if (regenerating) {</span>
+      // Update timer
+<span class="fc" id="L123">      energyTickTimer += delta;</span>
+      // Timer ran out, reset and regenerate energy
+<span class="fc bfc" id="L125" title="All 2 branches covered.">      if (energyTickTimer &gt; 1) {</span>
+<span class="fc" id="L126">        energyTickTimer = 0;</span>
+<span class="fc" id="L127">        increaseEnergy(regenerationRate);</span>
+      }
+    }
+<span class="fc" id="L130">  }</span>
+
+  /** Render the timer label. */
+  public void render(SpriteBatch batch) {
+<span class="nc" id="L134">    label.draw(batch, 255);</span>
+<span class="nc" id="L135">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

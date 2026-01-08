@@ -1,0 +1,434 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NameInputScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.screens</a> &gt; <span class="el_source">NameInputScreen.java</span></div><h1>NameInputScreen.java</h1><pre class="source lang-java linenums">package com.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.mazegame.Main;
+
+/**
+ * Name and sprite select screen. [04/01/2026] - Added to allow players to enter their name before
+ * starting the game.
+ */
+public class NameInputScreen extends ScreenAdapter {
+  public static final String SHEET1 = &quot;characters/playerAnimation.png&quot;;
+  public static final String SHEET2 = &quot;characters/playerAnimation2.png&quot;;
+  public static final String SPRITE1 = &quot;characters/player.png&quot;;
+  public static final String SPRITE2 = &quot;characters/player2.png&quot;;
+  private static final float BUTTON_WIDTH = 180f;
+  private static final float BUTTON_HEIGHT = 60f;
+  private static final float CONFIRM_BUTTON_ORIGINAL_WIDTH = 100f;
+  private static final float CONFIRM_BUTTON_ORIGINAL_HEIGHT = 150f;
+  private static final float BACK_BUTTON_ORIGINAL_WIDTH = BUTTON_WIDTH;
+  private static final float BACK_BUTTON_ORIGINAL_HEIGHT = BUTTON_HEIGHT;
+  private static final float TEXT_FIELD_ORIGINAL_WIDTH = 380f;
+  private static final float TEXT_FIELD_ORIGINAL_HEIGHT = 75f;
+  private static final int MAX_NAME_LENGTH = 20;
+  private static final int MIN_NAME_LENGTH = 1;
+  private final Main game;
+  private Stage stage;
+  private TextField nameTextField;
+  private Label titleLabel;
+  private Label hintLabel;
+  private Label characterCountLabel;
+  private ImageButton playerChoice1;
+  private ImageButton playerChoice2;
+  private TextButton backButton;
+
+  /**
+   * Initialise screen.
+   *
+   * @param game current instance of Main
+   */
+<span class="nc" id="L57">  public NameInputScreen(Main game) {</span>
+<span class="nc" id="L58">    this.game = game;</span>
+<span class="nc" id="L59">  }</span>
+
+  @Override
+  public void show() {
+<span class="nc" id="L63">    stage = new Stage(new ScreenViewport());</span>
+<span class="nc" id="L64">    Gdx.input.setInputProcessor(stage);</span>
+
+<span class="nc" id="L66">    titleLabel = new Label(&quot;Enter your name then select a character&quot;, Main.labelStyle);</span>
+<span class="nc" id="L67">    titleLabel.setColor(new Color(1f, 1f, 0f, 1f));</span>
+<span class="nc" id="L68">    titleLabel.setWrap(false);</span>
+
+<span class="nc" id="L70">    hintLabel = new Label(&quot;This name will appear on the leaderboard&quot;, Main.labelStyle);</span>
+<span class="nc" id="L71">    hintLabel.setColor(new Color(0.7f, 0.9f, 1f, 1f));</span>
+<span class="nc" id="L72">    hintLabel.setWrap(false);</span>
+
+    TextField.TextFieldStyle textFieldStyle;
+<span class="nc bnc" id="L75" title="All 2 branches missed.">    if (Main.uiSkin.has(&quot;default&quot;, TextField.TextFieldStyle.class)) {</span>
+<span class="nc" id="L76">      textFieldStyle = Main.uiSkin.get(&quot;default&quot;, TextField.TextFieldStyle.class);</span>
+    } else {
+<span class="nc" id="L78">      textFieldStyle = new TextField.TextFieldStyle();</span>
+<span class="nc" id="L79">      textFieldStyle.font = Main.bitmapFont;</span>
+<span class="nc" id="L80">      textFieldStyle.fontColor = Color.WHITE;</span>
+    }
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">    if (Main.uiSkin.has(&quot;textfield&quot;, com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {</span>
+<span class="nc" id="L84">      textFieldStyle.background = Main.uiSkin.getDrawable(&quot;textfield&quot;);</span>
+    } else {
+<span class="nc" id="L86">      Pixmap bgPixmap = new Pixmap(250, 100, Pixmap.Format.RGBA8888);</span>
+<span class="nc" id="L87">      bgPixmap.setColor(0.4f, 0.6f, 0.8f, 1f);</span>
+<span class="nc" id="L88">      bgPixmap.fill();</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">      for (int i = 0; i &lt; 3; i++) {</span>
+<span class="nc" id="L91">        float brightness = 0.5f + i * 0.1f;</span>
+<span class="nc" id="L92">        bgPixmap.setColor(brightness * 0.7f, brightness * 0.9f, brightness, 1f);</span>
+<span class="nc" id="L93">        bgPixmap.drawRectangle(i, i, 248 - i * 2, 98 - i * 2);</span>
+      }
+
+<span class="nc" id="L96">      int padding = 3;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">      for (int y = padding; y &lt; 97 - padding; y++) {</span>
+<span class="nc" id="L98">        float verticalFactor = 1f - (y - padding) / (float) (97 - padding * 2) * 0.15f;</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        for (int x = padding; x &lt; 247 - padding; x++) {</span>
+<span class="nc" id="L100">          float horizontalFactor = 0.92f + (x - padding) / (float) (247 - padding * 2) * 0.12f;</span>
+<span class="nc" id="L101">          bgPixmap.setColor(</span>
+              0.35f * verticalFactor * horizontalFactor,
+              0.42f * verticalFactor * horizontalFactor,
+              0.50f * verticalFactor * horizontalFactor,
+              1f);
+<span class="nc" id="L106">          bgPixmap.drawPixel(x, y);</span>
+        }
+      }
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">      for (int i = 0; i &lt; 2; i++) {</span>
+<span class="nc" id="L111">        float alpha = 0.6f - i * 0.2f;</span>
+<span class="nc" id="L112">        bgPixmap.setColor(0.7f, 0.8f, 0.95f, alpha);</span>
+<span class="nc" id="L113">        bgPixmap.drawLine(padding + i, padding + i, 247 - padding - i, padding + i);</span>
+      }
+
+<span class="nc" id="L116">      TextureRegion bgTexture = new TextureRegion(new Texture(bgPixmap));</span>
+<span class="nc" id="L117">      bgPixmap.dispose();</span>
+<span class="nc" id="L118">      textFieldStyle.background = new NinePatchDrawable(new NinePatch(bgTexture, 3, 3, 3, 3));</span>
+    }
+
+<span class="nc" id="L121">    textFieldStyle.fontColor = new Color(0.9f, 0.9f, 0.9f, 1f);</span>
+
+<span class="nc bnc" id="L123" title="All 2 branches missed.">    if (textFieldStyle.font != null) {</span>
+<span class="nc" id="L124">      textFieldStyle.font.getData().setScale(2.0f);</span>
+    }
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">    if (textFieldStyle.selection == null</span>
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        &amp;&amp; Main.uiSkin.has(&quot;selection&quot;, com.badlogic.gdx.scenes.scene2d.utils.Drawable.class)) {</span>
+<span class="nc" id="L129">      textFieldStyle.selection = Main.uiSkin.getDrawable(&quot;selection&quot;);</span>
+    }
+
+<span class="nc" id="L132">    nameTextField = new TextField(&quot;&quot;, textFieldStyle);</span>
+<span class="nc" id="L133">    nameTextField.setMaxLength(MAX_NAME_LENGTH);</span>
+<span class="nc" id="L134">    nameTextField.setMessageText(&quot;Type your name here...&quot;);</span>
+
+<span class="nc" id="L136">    nameTextField.setTextFieldListener(</span>
+<span class="nc" id="L137">        new TextField.TextFieldListener() {</span>
+          @Override
+          public void keyTyped(TextField textField, char c) {
+<span class="nc" id="L140">            updateCharacterCount();</span>
+<span class="nc" id="L141">          }</span>
+        });
+
+<span class="nc" id="L144">    characterCountLabel = new Label(&quot;0/&quot; + MAX_NAME_LENGTH, Main.labelStyle);</span>
+<span class="nc" id="L145">    characterCountLabel.setColor(new Color(0.8f, 0.85f, 0.95f, 1f));</span>
+<span class="nc" id="L146">    updateCharacterCount();</span>
+<span class="nc" id="L147">    TextureRegionDrawable drawable =</span>
+<span class="nc" id="L148">        new TextureRegionDrawable(new Texture(Gdx.files.internal(SPRITE1)));</span>
+<span class="nc" id="L149">    drawable.setMinSize(CONFIRM_BUTTON_ORIGINAL_WIDTH, CONFIRM_BUTTON_ORIGINAL_HEIGHT);</span>
+<span class="nc" id="L150">    playerChoice1 = new ImageButton(drawable);</span>
+<span class="nc" id="L151">    playerChoice1.setSize(CONFIRM_BUTTON_ORIGINAL_WIDTH, CONFIRM_BUTTON_ORIGINAL_HEIGHT);</span>
+
+<span class="nc" id="L153">    playerChoice1.addListener(</span>
+<span class="nc" id="L154">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L157">            confirmAndStart(SHEET1, SPRITE1);</span>
+<span class="nc" id="L158">          }</span>
+        });
+<span class="nc" id="L160">    drawable = new TextureRegionDrawable(new Texture(Gdx.files.internal(SPRITE2)));</span>
+<span class="nc" id="L161">    drawable.setMinSize(CONFIRM_BUTTON_ORIGINAL_WIDTH, CONFIRM_BUTTON_ORIGINAL_HEIGHT);</span>
+<span class="nc" id="L162">    playerChoice2 = new ImageButton(drawable);</span>
+<span class="nc" id="L163">    playerChoice2.setSize(CONFIRM_BUTTON_ORIGINAL_WIDTH, CONFIRM_BUTTON_ORIGINAL_HEIGHT);</span>
+
+<span class="nc" id="L165">    playerChoice2.addListener(</span>
+<span class="nc" id="L166">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L169">            confirmAndStart(SHEET2, SPRITE2);</span>
+<span class="nc" id="L170">          }</span>
+        });
+
+<span class="nc" id="L173">    backButton = new TextButton(&quot;Back&quot;, Main.uiSkin);</span>
+<span class="nc" id="L174">    backButton.setSize(BACK_BUTTON_ORIGINAL_WIDTH, BACK_BUTTON_ORIGINAL_HEIGHT);</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">    if (backButton.getLabel() != null) {</span>
+<span class="nc" id="L176">      backButton.getLabel().setWrap(true);</span>
+    }
+<span class="nc" id="L178">    backButton.addListener(</span>
+<span class="nc" id="L179">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L182">            game.setScreen(new HomeScreen(game));</span>
+<span class="nc" id="L183">          }</span>
+        });
+
+<span class="nc" id="L186">    stage.addActor(titleLabel);</span>
+<span class="nc" id="L187">    stage.addActor(hintLabel);</span>
+<span class="nc" id="L188">    stage.addActor(nameTextField);</span>
+<span class="nc" id="L189">    stage.addActor(characterCountLabel);</span>
+<span class="nc" id="L190">    stage.addActor(playerChoice1);</span>
+<span class="nc" id="L191">    stage.addActor(playerChoice2);</span>
+<span class="nc" id="L192">    stage.addActor(backButton);</span>
+
+<span class="nc" id="L194">    stage.setKeyboardFocus(nameTextField);</span>
+<span class="nc" id="L195">    updatePositions(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());</span>
+<span class="nc" id="L196">  }</span>
+
+  private void updatePositions(float screenWidth, float screenHeight) {
+<span class="nc" id="L199">    float centerX = screenWidth / 2f;</span>
+
+    float scaleX =
+<span class="nc bnc" id="L202" title="All 4 branches missed.">        screenWidth &gt; 0 &amp;&amp; Main.VIEWPORT_SIZE.x &gt; 0 ? screenWidth / Main.VIEWPORT_SIZE.x : 1f;</span>
+    float scaleY =
+<span class="nc bnc" id="L204" title="All 4 branches missed.">        screenHeight &gt; 0 &amp;&amp; Main.VIEWPORT_SIZE.y &gt; 0 ? screenHeight / Main.VIEWPORT_SIZE.y : 1f;</span>
+<span class="nc" id="L205">    float fontScale = Math.max(0.1f, Math.min(scaleX, scaleY));</span>
+
+<span class="nc" id="L207">    float titleY = screenHeight * 0.92f;</span>
+<span class="nc" id="L208">    float hintY = screenHeight * 0.75f;</span>
+
+<span class="nc bnc" id="L210" title="All 2 branches missed.">    if (titleLabel != null) {</span>
+<span class="nc" id="L211">      titleLabel.setFontScale(fontScale);</span>
+<span class="nc" id="L212">      titleLabel.pack();</span>
+<span class="nc" id="L213">      titleLabel.setPosition(centerX - titleLabel.getWidth() / 2f, titleY);</span>
+    }
+
+<span class="nc bnc" id="L216" title="All 2 branches missed.">    if (hintLabel != null) {</span>
+<span class="nc" id="L217">      hintLabel.setFontScale(0.75f * fontScale);</span>
+<span class="nc" id="L218">      hintLabel.pack();</span>
+<span class="nc" id="L219">      hintLabel.setPosition(centerX - hintLabel.getWidth() / 2f, hintY);</span>
+    }
+
+<span class="nc bnc" id="L222" title="All 2 branches missed.">    if (nameTextField != null) {</span>
+<span class="nc" id="L223">      float fieldWidth = TEXT_FIELD_ORIGINAL_WIDTH * fontScale;</span>
+<span class="nc" id="L224">      float fieldHeight = TEXT_FIELD_ORIGINAL_HEIGHT * fontScale;</span>
+<span class="nc" id="L225">      nameTextField.setSize(fieldWidth, fieldHeight);</span>
+<span class="nc" id="L226">      nameTextField.setPosition(centerX - nameTextField.getWidth() / 2f, screenHeight * 0.55f);</span>
+
+<span class="nc bnc" id="L228" title="All 2 branches missed.">      if (nameTextField.getStyle().font != null) {</span>
+<span class="nc" id="L229">        nameTextField.getStyle().font.getData().setScale(1.0f);</span>
+<span class="nc" id="L230">        float baseFontHeight = nameTextField.getStyle().font.getLineHeight();</span>
+<span class="nc" id="L231">        float baseCapHeight = nameTextField.getStyle().font.getCapHeight();</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (baseFontHeight &lt;= 0) {</span>
+<span class="nc" id="L233">          baseFontHeight = 15f;</span>
+        }
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        if (baseCapHeight &lt;= 0) {</span>
+<span class="nc" id="L236">          baseCapHeight = baseFontHeight * 0.7f;</span>
+        }
+
+        float maxFontScaleByHeight =
+<span class="nc bnc" id="L240" title="All 4 branches missed.">            (baseCapHeight &gt; 0 &amp;&amp; fieldHeight &gt; 0) ? (fieldHeight * 0.70f) / baseCapHeight : 2.0f;</span>
+
+<span class="nc" id="L242">        float avgCharWidth = 10f;</span>
+
+<span class="nc" id="L244">        com.badlogic.gdx.graphics.g2d.GlyphLayout layout =</span>
+            new com.badlogic.gdx.graphics.g2d.GlyphLayout();
+<span class="nc" id="L246">        layout.setText(nameTextField.getStyle().font, &quot;M&quot;);</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        if (layout.width &gt; 0) {</span>
+<span class="nc" id="L248">          avgCharWidth = layout.width;</span>
+        }
+
+        float maxFontScaleByWidth =
+<span class="nc bnc" id="L252" title="All 2 branches missed.">            fieldWidth &gt; 0 ? fieldWidth * 0.85f / (avgCharWidth * MAX_NAME_LENGTH) : 2.0f;</span>
+
+<span class="nc" id="L254">        float calculatedScale = Math.max(0.5f, Math.min(maxFontScaleByHeight, maxFontScaleByWidth));</span>
+<span class="nc" id="L255">        float baseScale = 2.2f;</span>
+<span class="nc" id="L256">        float scaledBase = baseScale * fontScale;</span>
+<span class="nc" id="L257">        float minScale = Math.max(0.5f, scaledBase * 0.85f);</span>
+<span class="nc" id="L258">        float maxScale = scaledBase * 1.5f;</span>
+<span class="nc" id="L259">        float textScale = Math.max(0.5f, Math.max(minScale, Math.min(calculatedScale, maxScale)));</span>
+
+<span class="nc" id="L261">        nameTextField.getStyle().font.getData().setScale(textScale);</span>
+<span class="nc" id="L262">        nameTextField.getStyle().font.getData().setLineHeight(fieldHeight);</span>
+
+<span class="nc" id="L264">        float cursorHeight = Math.max(1f, fieldHeight * 0.75f);</span>
+
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        if (nameTextField.getStyle().cursor</span>
+            instanceof com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable) {
+<span class="nc" id="L268">          com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable oldcursor =</span>
+              (com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable)
+<span class="nc" id="L270">                  nameTextField.getStyle().cursor;</span>
+<span class="nc bnc" id="L271" title="All 4 branches missed.">          if (oldcursor.getRegion() != null &amp;&amp; oldcursor.getRegion().getTexture() != null) {</span>
+<span class="nc" id="L272">            oldcursor.getRegion().getTexture().dispose();</span>
+          }
+        }
+
+<span class="nc" id="L276">        int cursorWidth = Math.max(2, (int) (fontScale * 3f));</span>
+<span class="nc" id="L277">        Pixmap cursorPixmap =</span>
+            new Pixmap(cursorWidth + 2, (int) cursorHeight + 2, Pixmap.Format.RGBA8888);
+
+<span class="nc" id="L280">        float cursorCenterX = cursorPixmap.getWidth() / 2f;</span>
+<span class="nc" id="L281">        float cursorCenterY = cursorPixmap.getHeight() / 2f;</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">        for (int y = 0; y &lt; cursorPixmap.getHeight(); y++) {</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">          for (int x = 0; x &lt; cursorPixmap.getWidth(); x++) {</span>
+<span class="nc" id="L284">            float dist = Math.max(Math.abs(x - cursorCenterX), Math.abs(y - cursorCenterY));</span>
+
+<span class="nc bnc" id="L286" title="All 2 branches missed.">            if (dist &lt;= cursorWidth / 2f + 1.5f) {</span>
+<span class="nc" id="L287">              float alpha = 1f;</span>
+<span class="nc bnc" id="L288" title="All 2 branches missed.">              if (dist &gt; cursorWidth / 2f - 0.5f) {</span>
+<span class="nc" id="L289">                alpha = Math.max(0.4f, 1f - (dist - (cursorWidth / 2f - 0.5f)) * 1.5f);</span>
+              }
+<span class="nc" id="L291">              float brightness = Math.max(0.85f, 1f - (dist / (cursorWidth / 2f)) * 0.15f);</span>
+<span class="nc" id="L292">              cursorPixmap.setColor(brightness, brightness * 0.98f, brightness * 0.95f, alpha);</span>
+<span class="nc" id="L293">              cursorPixmap.drawPixel(x, y);</span>
+            }
+          }
+        }
+
+<span class="nc" id="L298">        Texture cursorTexture = new Texture(cursorPixmap);</span>
+<span class="nc" id="L299">        cursorPixmap.dispose();</span>
+<span class="nc" id="L300">        nameTextField.getStyle().cursor =</span>
+            new com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(
+                new com.badlogic.gdx.graphics.g2d.TextureRegion(cursorTexture));
+      }
+    }
+
+<span class="nc bnc" id="L306" title="All 2 branches missed.">    if (characterCountLabel != null) {</span>
+<span class="nc" id="L307">      characterCountLabel.setFontScale(0.5f * fontScale);</span>
+<span class="nc" id="L308">      characterCountLabel.pack();</span>
+<span class="nc" id="L309">      characterCountLabel.setPosition(</span>
+          centerX + 2 + (TEXT_FIELD_ORIGINAL_WIDTH * scaleX) / 2, screenHeight * 0.61f);
+    }
+
+<span class="nc bnc" id="L313" title="All 2 branches missed.">    if (playerChoice1 != null) {</span>
+<span class="nc" id="L314">      playerChoice1.setSize(</span>
+          CONFIRM_BUTTON_ORIGINAL_WIDTH * scaleX, CONFIRM_BUTTON_ORIGINAL_HEIGHT * scaleY);
+<span class="nc" id="L316">      playerChoice1.setPosition(centerX + 2, screenHeight * 0.23f);</span>
+    }
+
+<span class="nc bnc" id="L319" title="All 2 branches missed.">    if (playerChoice2 != null) {</span>
+<span class="nc" id="L320">      playerChoice2.setSize(</span>
+          CONFIRM_BUTTON_ORIGINAL_WIDTH * scaleX, CONFIRM_BUTTON_ORIGINAL_HEIGHT * scaleY);
+<span class="nc" id="L322">      playerChoice2.setPosition(centerX - playerChoice2.getWidth() - 2, screenHeight * 0.23f);</span>
+    }
+
+<span class="nc bnc" id="L325" title="All 2 branches missed.">    if (backButton != null) {</span>
+<span class="nc" id="L326">      backButton.setSize(</span>
+          BACK_BUTTON_ORIGINAL_WIDTH * fontScale, BACK_BUTTON_ORIGINAL_HEIGHT * fontScale);
+<span class="nc bnc" id="L328" title="All 2 branches missed.">      if (backButton.getLabel() != null) {</span>
+<span class="nc" id="L329">        float buttonHeight = BACK_BUTTON_ORIGINAL_HEIGHT * fontScale;</span>
+<span class="nc" id="L330">        float buttonWidth = BACK_BUTTON_ORIGINAL_WIDTH * fontScale;</span>
+<span class="nc" id="L331">        float maxFontScaleByHeight = (buttonHeight * 0.6f) / 15f;</span>
+<span class="nc" id="L332">        float maxFontScaleByWidth = (buttonWidth * 0.8f) / 30f;</span>
+<span class="nc" id="L333">        float buttonFontScale =</span>
+<span class="nc" id="L334">            Math.min(fontScale * 1.5f, Math.min(maxFontScaleByHeight, maxFontScaleByWidth));</span>
+<span class="nc" id="L335">        backButton.getLabel().setFontScale(buttonFontScale);</span>
+<span class="nc" id="L336">        backButton.getLabel().setWrap(true);</span>
+      }
+<span class="nc" id="L338">      backButton.setPosition(centerX - backButton.getWidth() / 2f, screenHeight * 0.08f);</span>
+    }
+<span class="nc" id="L340">  }</span>
+
+  private void updateCharacterCount() {
+<span class="nc bnc" id="L343" title="All 4 branches missed.">    if (nameTextField != null &amp;&amp; characterCountLabel != null) {</span>
+<span class="nc" id="L344">      int currentLength = nameTextField.getText().length();</span>
+<span class="nc" id="L345">      characterCountLabel.setText(currentLength + &quot;/&quot; + MAX_NAME_LENGTH);</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">      if (currentLength &gt;= MAX_NAME_LENGTH) {</span>
+<span class="nc" id="L347">        characterCountLabel.setColor(new Color(1f, 0.7f, 0.5f, 1f));</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">      } else if (currentLength &lt; MIN_NAME_LENGTH) {</span>
+<span class="nc" id="L349">        characterCountLabel.setColor(new Color(0.75f, 0.85f, 0.95f, 1f));</span>
+      } else {
+<span class="nc" id="L351">        characterCountLabel.setColor(new Color(0.4f, 0.95f, 1f, 1f));</span>
+      }
+<span class="nc" id="L353">      updatePositions(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());</span>
+    }
+<span class="nc" id="L355">  }</span>
+
+  private void confirmAndStart(String sheetName, String imgName) {
+<span class="nc" id="L358">    String enteredName = nameTextField.getText().trim();</span>
+<span class="nc bnc" id="L359" title="All 2 branches missed.">    if (!enteredName.isEmpty()) {</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">      if (enteredName.length() &gt; MAX_NAME_LENGTH) {</span>
+<span class="nc" id="L361">        enteredName = enteredName.substring(0, MAX_NAME_LENGTH);</span>
+      }
+<span class="nc" id="L363">      game.setPlayerName(enteredName);</span>
+<span class="nc" id="L364">      game.setScreen(new GameIntroScreen(game, sheetName, imgName));</span>
+    }
+<span class="nc" id="L366">  }</span>
+
+  @Override
+  public void render(float delta) {
+<span class="nc" id="L370">    Gdx.gl.glClearColor(0.15f, 0.18f, 0.25f, 1);</span>
+<span class="nc" id="L371">    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);</span>
+
+<span class="nc" id="L373">    game.getViewport().apply();</span>
+<span class="nc" id="L374">    stage.act(delta);</span>
+
+<span class="nc" id="L376">    com.badlogic.gdx.graphics.g2d.SpriteBatch batch = game.getBatch();</span>
+<span class="nc" id="L377">    batch.setProjectionMatrix(stage.getCamera().combined);</span>
+
+<span class="nc" id="L379">    batch.begin();</span>
+<span class="nc bnc" id="L380" title="All 4 branches missed.">    if (titleLabel != null &amp;&amp; titleLabel.isVisible()) {</span>
+<span class="nc" id="L381">      float screenWidth = Gdx.graphics.getWidth();</span>
+<span class="nc" id="L382">      float screenHeight = Gdx.graphics.getHeight();</span>
+<span class="nc" id="L383">      float centerX = screenWidth / 2f;</span>
+<span class="nc" id="L384">      float titleY = screenHeight * 0.82f;</span>
+<span class="nc" id="L385">      float outlineOffset = 3f;</span>
+
+<span class="nc" id="L387">      titleLabel.setColor(new Color(0f, 0f, 0f, 0.8f));</span>
+<span class="nc bnc" id="L388" title="All 2 branches missed.">      for (int dx = -1; dx &lt;= 1; dx++) {</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">        for (int dy = -1; dy &lt;= 1; dy++) {</span>
+<span class="nc bnc" id="L390" title="All 4 branches missed.">          if (dx != 0 || dy != 0) {</span>
+<span class="nc" id="L391">            titleLabel.setPosition(</span>
+<span class="nc" id="L392">                centerX - titleLabel.getWidth() / 2f + dx * outlineOffset,</span>
+                titleY + dy * outlineOffset);
+<span class="nc" id="L394">            titleLabel.draw(batch, 1f);</span>
+          }
+        }
+      }
+
+<span class="nc" id="L399">      titleLabel.setColor(new Color(1f, 1f, 0f, 1f));</span>
+<span class="nc" id="L400">      titleLabel.setPosition(centerX - titleLabel.getWidth() / 2f, titleY);</span>
+<span class="nc" id="L401">      titleLabel.draw(batch, 1f);</span>
+    }
+<span class="nc" id="L403">    batch.end();</span>
+
+<span class="nc bnc" id="L405" title="All 4 branches missed.">    boolean titleWasVisible = titleLabel != null &amp;&amp; titleLabel.isVisible();</span>
+<span class="nc bnc" id="L406" title="All 2 branches missed.">    if (titleLabel != null) {</span>
+<span class="nc" id="L407">      titleLabel.setVisible(false);</span>
+    }
+<span class="nc" id="L409">    stage.draw();</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">    if (titleLabel != null) {</span>
+<span class="nc" id="L411">      titleLabel.setVisible(titleWasVisible);</span>
+    }
+
+<span class="nc bnc" id="L414" title="All 2 branches missed.">    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {</span>
+<span class="nc" id="L415">      game.setScreen(new HomeScreen(game));</span>
+    }
+<span class="nc" id="L417">  }</span>
+
+  @Override
+  public void resize(int width, int height) {
+<span class="nc bnc" id="L421" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L422">      stage.getViewport().update(width, height, true);</span>
+<span class="nc" id="L423">      updatePositions(width, height);</span>
+    }
+<span class="nc" id="L425">  }</span>
+
+  @Override
+  public void dispose() {
+<span class="nc bnc" id="L429" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L430">      stage.dispose();</span>
+    }
+<span class="nc" id="L432">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
