@@ -23,7 +23,7 @@
             <div class="tab dropdown active">
                 <div tabindex="0">Architecture Design ▶</div>
                 <div class="dropdown-menu">
-                    <a class = "active" href="">CRC cards</a>
+                    <a class="active" href="">CRC cards</a>
                     <a href="#">CRC to requirements map</a>
                     <a href="#">Sequence Diagrams</a>
                     <a href="#">Class Diagrams</a>
@@ -37,343 +37,629 @@
         </nav>
     </div>
 
- <main class="page">
+    <main class="page">
 
         <!-- Grid layout -->
         <div class="crc-grid">
 
             <section class="card crc-card">
                 <h1>Class: Main</h1>
-                <p><strong>Responsibility</strong><br>
-                    Start the game, set and change screens, control the overall game flow
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    HomeScreen, WorldScreen, WinScreen
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Initialise and run the game lifecycle</li>
+                    <li>Configure world and viewport dimensions</li>
+                    <li>Load and manage shared graphical resources (SpriteBatch, fonts, UI skin)</li>
+                    <li>Maintain global game configuration values and event locations</li>
+                    <li>Store and manage the current player’s name</li>
+                    <li>Set the initial screen and control screen transitions</li>
+                    <li>Reset global game state between runs</li>
+                    <li>Handle window resizing and resource disposal</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>HomeScreen - initial screen controlled through screen transitions</li>
+                    <li>FitViewport, SpriteBatch, BitmapFont, LabelStyle, Skin - shared resources accessed by all
+                        screens</li>
+                    <li>Event, HiddenEvent - global event state reset through Main</li>
+                </ul>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Player</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store player information, update player state, allow events to change player values
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    WorldScreen, Energy, Animator
-                </p>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Manage the player character, including position, movement, and rotation</li>
+                    <li>Handle input and apply movement physics, sprinting, wind, and woozy effects</li>
+                    <li>Control player animations through the Animator superclass</li>
+                    <li>Track and update energy levels, including sprinting and sugar crash effects</li>
+                    <li>Render the player sprite on screen</li>
+                    <li>Provide accessors and mutators for sprite, position, speed, and rotation</li>
+                    <li>Reset player speed and manage shared movement state</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Animator - inherited animation logic and frame control</li>
+                    <li>Energy - stores and updates player energy</li>
+                    <li>WorldScreen, HomeScreen - controlled by game screens for movement and events</li>
+                    <li>Main - global game context, resource access</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Energy</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store the player’s energy value, increase or decrease energy
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Player
-                </p>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Manage the player's energy level, including current energy and maximum energy</li>
+                    <li>Regenerate energy over time when allowed</li>
+                    <li>Provide methods to increase or reduce energy safely</li>
+                    <li>Determine whether energy is accessible (usable) at the current state</li>
+                    <li>Update energy each frame via tick() to apply regeneration</li>
+                    <li>Render a visual energy label on the screen</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Player - uses Energy to manage sprint and movement capability</li>
+                    <li>Main.labelStyle - shared label style for consistent UI text</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Animator</h1>
-                <p><strong>Responsibility</strong><br>
-                    Load animations, update animation frames
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Player, Frog, Security
-                </p>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Load a sprite sheet from a file</li>
+                    <li>Cut the sprite sheet into frames based on rows and columns</li>
+                    <li>Generate animations from sprite sheet frames and store them in a dictionary</li>
+                    <li>Provide access to animations for other classes</li>
+                    <li>Dispose of the sprite sheet texture when no longer needed</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Player - uses Animator to generate movement and action animations</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: WorldMap</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store the game world layout, track the player’s current room, control movement between rooms
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    JsonRoom, JsonObstacle, OrthogonalDirection, Obstacle
-                </p>
+                <ul>
+                    <li>Load the game map from JSON and store room data</li>
+                    <li>Manage the current and previous room locations</li>
+                    <li>Load and render room textures</li>
+                    <li>Generate and manage obstacles, coins, and room borders</li>
+                    <li>Handle player movement between rooms</li>
+                    <li>Provide room information and access to obstacles</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>JsonRoom - stores room data loaded from JSON</li>
+                    <li>Obstacle - represents walls, coins, and interactive objects in rooms</li>
+                    <li>Main - provides constants like WORLD_WIDTH and WORLD_HEIGHT</li>
+                    <li>OrthogonalDirection - indicates movement direction for player transitions</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: JsonRoom</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store room data loaded from JSON, hold room description and exits
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    JsonObstacle, OrthogonalDirection
-                </p>
+                <ul>
+                    <li>Represent a room as encoded in map.json</li>
+                    <li>Store references to neighboring rooms in four directions: left, right, up, down</li>
+                    <li>Store obstacles present in the room</li>
+                    <li>Provide information about the next room in a given direction</li>
+                    <li>Provide a readable string representation of the room for debugging</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>OrthogonalDirection - used to query neighboring rooms</li>
+                    <li>JsonObstacle - represents obstacles within the room</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: JsonObstacle</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store obstacle data from JSON
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    JsonRoom, WorldMap
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent an obstacle as encoded in map.json</li>
+                    <li>Store position coordinates, width and height</li>
+                    <li>Store texture path for the obstacle (textureInternalPath)</li>
+                    <li>Provide a string representation for debugging purposes</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>WorldMap - used to load obstacles into a room</li>
+                    <li>JsonRoom - contains an array of JsonObstacle objects</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Interface: Event</h1>
-                <p><strong>Responsibility</strong><br>
-                    Base structure for all events, shared behavior for displaying text and applying effects
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Player, WorldScreen
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent an event in the world that can be triggered</li>
+                    <li>Track whether the event has been triggered</li>
+                    <li>Provide methods to trigger the event and set/get its position</li>
+                    <li>Maintain global counters for positive and negative events</li>
+                    <li>Allow counters to be reset when the game resets</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Any World Object or Manager that triggers events</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: HomeScreen</h1>
-                <p><strong>Responsibility</strong><br>
-                    Display the main menu UI, handle menu navigation
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    NameInputScreen, LeaderboardScreen, AchievementsScreen
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Display the home screen to the player</li>
+                    <li>Provide buttons for starting the game, viewing leaderboard, and achievements</li>
+                    <li>Handle input events such as button clicks and Enter key press</li>
+                    <li>Scale and position UI elements responsively based on screen size</li>
+                    <li>Delegate screen transitions to the main game controller</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main - the main game controller that manages screen transitions</li>
+                    <li>NameInputScreen - the screen to display when starting a new game</li>
+                    <li>LeaderboardScreen - the screen to display when leaderboard is requested</li>
+                    <li>AchievementScreen - the screen to display when achievements are requested</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Item</h1>
-                <p><strong>Responsibility</strong><br>
-                    Represent a usable or collectable item
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    ItemType, Obstacle
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent an item in the game world that can be interacted with</li>
+                    <li>Apply effect when triggered</li>
+                    <li>Dispose itself after being used</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Obstacle - inherits position, size, and collision behavior</li>
+                    <li>ItemType - categorizes the item (e.g., consumable, inventory item)</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Frog</h1>
-                <p><strong>Responsibility</strong><br>
-                    Control frog behaviour and interaction events
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Animator, Player, Main, WorldScreen
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a frog entity that can interact with the player by eating or releasing them</li>
+                    <li>Manage animations for different frog states (idle, eyes, croak)</li>
+                    <li>Track internal state such as whether it has swallowed the player, escape progress, and punch
+                        animation</li>
+                    <li>Provide collision bounds for interaction with the player</li>
+                    <li>Handle time-based updates for animations and state transitions</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Animator - provides animation handling and sprite sheet processing</li>
+                    <li>Player - interacts with frog during eat and escape sequences</li>
+                    <li>Main - supplies global game state (e.g., current frog location)</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Security</h1>
-                <p><strong>Responsibility</strong><br>
-                    Control the campus security character, apply penalties
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    WorldMap, WorldScreen, DuckStatue
-                </p>
+                <ul>
+                    <li>Represent a campus security character</li>
+                    <li>Track state such as whether it has stolen a duck and whether it is sleeping</li>
+                    <li>Manage animations for different security states (walking, sleeping)</li>
+                    <li>Update position</li>
+                    <li>Provide collision bounds for interactions with other entities</li>
+                    <li>Handle behavior on room changes (e.g., fall asleep if duck stolen)</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Animator - provides animation handling and sprite sheet processing</li>
+                    <li>WorldMap - provides room boundaries for movement limits</li>
+                    <li>Main - provides global game state (e.g., current security location)</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: SlipOnCoffee</h1>
-                <p><strong>Responsibility</strong><br>
-                    Handle the coffee slip event and apply effects
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Player, WorldScreen
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a negative event where the player slips on coffee</li>
+                    <li>Track whether the event has been triggered and whether it is active</li>
+                    <li>Control slip motion direction, duration, and rotation effects on the player</li>
+                    <li>Reset itself when the player leaves the room</li>
+                    <li>Increment the global negative event counter when triggered</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Player - apply movement and rotation effects during slip</li>
+                    <li>Event - increment negative event counter</li>
+                    <li>Obstacle - provide bounding box and position</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: DuckStatue</h1>
-                <p><strong>Responsibility</strong><br>
-                    Control the duck statue event and check progress
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    DuckStatuePiece, WorldMap, Main
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Manage all pieces of the duck statue in the game</li>
+                    <li>Track which pieces have been found or triggered</li>
+                    <li>Display jigsaw of pieces when found</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>DuckStatuePiece - represents individual parts of the duck</li>
+                    <li>Main - provides world dimensions for positioning logic</li>
+                    <li>WorldMap - provides boundary information for placing pieces</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: DuckStatuePiece</h1>
-                <p><strong>Responsibility</strong><br>
-                    Represent a statue piece and support the statue event
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    WorldMap, Main
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a single piece of the duck statue in the game</li>
+                    <li>Track whether the piece has been collected (triggered)</li>
+                    <li>Track whether the piece has been stolen by campus security</li>
+                    <li>Provide information about which room the piece belongs to</li>
+                    <li>Allow pieces to be stolen or returned (unsteal)</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Obstacle - inherits position and size</li>
+                    <li>DuckStatue - for assembling all pieces together</li>
+                    <li>HiddenEvent - increments counter if the hat piece is collected</li>
+                    <li>Main - for checking player location (e.g. security room logic)</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: HiddenEvent</h1>
-                <p><strong>Responsibility</strong><br>
-                    Base for background events
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    WorldScreen, Event
-                </p>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a hidden event in the game</li>
+                    <li>Track the event's position in the world</li>
+                    <li>Track whether the event has been triggered or is active</li>
+                    <li>Provide static counter for total hidden events triggered</li>
+                    <li>Allow events to be triggered, reset, or deactivated</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Event - implements the interface for triggering and tracking events</li>
+                    <li>Other game systems - can query the counter or check if an event is active</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: PowerCut</h1>
-                <p><strong>Responsibility</strong><br>
-                    Apply a random power cut effect in Piazza
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    HiddenEvent, Main
-                </p>
+                <ul>
+                    <li>Represent a hidden event that darkens the player's screen for a fixed duration</li>
+                    <li>Track whether the event has been triggered and whether it is active</li>
+                    <li>Manage the darkness level over time, fading back to normal after the event ends</li>
+                    <li>Reset itself when the power cut ends</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>WorldScreen - triggered through the main game loop</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: RamblingProfessorEvent</h1>
-                <p><strong>Responsibility</strong><br>
-                    Control the professor event
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    HiddenEvent, Main
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a hidden event of a professor character who continuously speaks lines of dialogue</li>
+                    <li>Load and manage a list of speech lines from an external file</li>
+                    <li>Update which line the professor is currently saying over time</li>
+                    <li>Render the professor sprite and name label in the correct room</li>
+                    <li>Track position and bounds for potential player interaction</li>
+                </ul>
+                <h2 class="section-heading">Collaboration</h4>
+                    <ul>
+                        <li>HiddenEvent - Inherits functionality for triggering and activation tracking.</li>
+                        <li>Main - Provides current world dimensions and room information for rendering and label
+                            positioning.</li>
+                    </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: WindEvent</h1>
-                <p><strong>Responsibility</strong><br>
-                    Apply wind effects during gameplay
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    HiddenEvent, Main
-                </p>
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Simulate wind along the main path of the game by moving and rotating leaves.</li>
+                    <li>Trigger and manage wind direction and activity as a hidden environmental event.</li>
+                    <li>Update leaf positions over time and remove leaves that go out of bounds.</li>
+                    <li>Render leaves to the screen if the player is in the correct room.</li>
+                </ul>
+                <h2 class="section-heading">Collaboration</h4>
+
+                    <ul>
+                        <li>HiddenEvent - Inherits functionality for triggering and activation tracking.</li>
+                        <li>Main - Provides player location to determine if wind effects should be active.</li>
+                        <li>AudioManager - Plays and stops wind sound based on wind activation and direction.</li>
+                    </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: NameInputScreen</h1>
-                <p><strong>Responsibility</strong><br>
-                    Get the player’s name
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Main, HomeScreen, GameIntroScreen
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Collect the player's name and validate its length</li>
+                    <li>Allow the player to select one of two character sprites</li>
+                    <li>Dynamically position and scale UI elements according to screen size</li>
+                    <li>Handle navigation actions, including starting the game or returning to the home screen</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main - stores the player's name, provides viewport and sprite batch, manages screen transitions
+                    </li>
+                    <li>HomeScreen - used when the player navigates back</li>
+                    <li>GameIntroScreen - launched after the player confirms name and character selection</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: GameIntroScreen</h1>
-                <p><strong>Responsibility</strong><br>
-                    Show the game introduction and start the game world
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Main, WorldScreen, WorldMap, HomeScreen
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Provide an introductory narrative explaining the game context and objectives</li>
+                    <li>Allow the player to proceed to the main game via a "Play" button</li>
+                    <li>Dynamically scale and position UI elements according to screen size</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main - provides viewport, batch, label style, UI skin, and manages screen transitions</li>
+                    <li>WorldScreen - launched when the player presses "Play" to start the game</li>
+                    <li>WorldMap - provides boundary width for proper text layout</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: WinScreen</h1>
-                <p><strong>Responsibility</strong><br>
-                    Show the win screen and handle input
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    HomeScreen, Main, LeaderboardManager, AchievementManager
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Display the winning screen background</li>
+                    <li>Show player's final score and remaining time</li>
+                    <li>Provide buttons to view the leaderboard, achievements, or return to the home screen</li>
+                    <li>Save the player's score to the leaderboard upon first showing the screen</li>
+                    <li>Scale and position UI elements dynamically based on screen size</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main - provides viewport, batch, label style, UI skin, and manages screen transitions</li>
+                    <li>LeaderboardManager - handles saving and retrieving leaderboard scores</li>
+                    <li>AchievementManager - tracks and provides player's achievements</li>
+                    <li>LeaderboardScreen - displayed when the player clicks the "Leaderboard" button</li>
+                    <li>AchievementScreen - displayed when the player clicks the "Achievements" button</li>
+                    <li>HomeScreen - returned to when the player clicks the "Return" button</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: AudioManager</h1>
-                <p><strong>Responsibility</strong><br>
-                    Load and play sounds and music
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    WorldScreen
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Manage all game sounds and background music</li>
+                    <li>Provide methods to play individual sound effects</li>
+                    <li>Control looping sounds such as background music and wind</li>
+                    <li>Support volume control for sound effects and music separately</li>
+                    <li>Enable muting and unmuting while preserving previous volume levels</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main game loop / Screens - call AudioManager methods to play sounds based on in-game events</li>
+                    <li>Events and gameplay classes (e.g., WindEvent, PowerCut) - trigger specific sound effects</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Timer</h1>
-                <p><strong>Responsibility</strong><br>
-                    Track elapsed or countdown time
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    WorldScreen
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Keep track of the remaining game time in seconds</li>
+                    <li>Update the timer each frame and manage countdown logic</li>
+                    <li>Render the timer label and a "Game Over" timeout screen when time runs out</li>
+                    <li>Support pausing and resuming the timer</li>
+                    <li>Provide formatted time as mm:ss for display</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main - for label style and viewport/world dimensions</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Score</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store and manage the player’s score
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Main, LeaderboardManager
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Track the player's current score throughout the game</li>
+                    <li>Provide methods to add or subtract points</li>
+                    <li>Apply special bonuses, such as the duck bonus or time remaining bonus</li>
+                    <li>Reset the score to zero when a new game starts</li>
+                    <li>Render the score as a Label on the screen</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>Main - access label style and world dimensions for positioning the label</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: LeaderboardManager</h1>
-                <p><strong>Responsibility</strong><br>
-                    Save, load, and sort leaderboard entries
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    LeaderboardData, ScoreEntry
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Manage the local leaderboard by storing and retrieving player scores</li>
+                    <li>Add new scores with player name, score, time left, and date</li>
+                    <li>Sort scores in descending order5</li>
+                    <li>Filter out incomplete or invalid entries when loading scores</li>
+                    <li>Save and load scores from a local JSON file</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>ScoreEntry, LeaderboardData - represents individual scores and the full leaderboard</li>
+                    <li>WinScreen, WorldScreen - calls addScore when a game ends</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: LeaderboardData</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store leaderboard information
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    ScoreEntry
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Encapsulates a list of leaderboard entries</li>
+                    <li>Holds multiple ScoreEntry objects</li>
+                    <li>Provides constructors for default initialization or from an existing list of scores</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>ScoreEntry - represents individual score records</li>
+                    <li>LeaderboardManager - uses LeaderboardData to save/load scores to/from JSON</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: ScoreEntry</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store one player score
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    LeaderboardData
-                </p>
+
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Encapsulate information about a single leaderboard record</li>
+                    <li>Provide default values for backward compatibility</li>
+                    <li>Ensure player name is always non-empty</li>
+                </ul>
+
+                <h2 class="section-heading">Collaboration</h2>
+                <ul>
+                    <li>LeaderboardManager - used to create, store, and sort leaderboard entries</li>
+                    <li>LeaderboardData - stored as part of a list of ScoreEntry objects for JSON storage</li>
+
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: AchievementManager</h1>
-                <p><strong>Responsibility</strong><br>
-                    Track achievement progress and unlock achievements
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Achievement, AchievementData
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Initialize all available achievements with ID, name, and description</li>
+                    <li>Unlock achievements and store the unlock date</li>
+                    <li>Check if a specific achievement is unlocked</li>
+                    <li>Reset all achievements</li>
+                    <li>Save and load achievement data from local JSON storage</li>
+                    <li>Provide access to all achievements or a specific achievement by ID</li>
+                </ul>
+
+                <h2 class="section-heading">Collaborations</h2>
+                <ul>
+                    <li>Achievement - represents an individual achievement and its state (unlocked, unlock date)</li>
+                    <li>AchievementData - wrapper class for serializing/deserializing a list of Achievement objects to
+                        JSON</li>
+                    <li>Game logic - interacts indirectly with gameplay systems to unlock achievements based on player
+                        actions</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: Achievement</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store one achievement
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    AchievementManager
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Store a unique ID, name, and description for the achievement</li>
+                    <li>Track whether the achievement has been unlocked</li>
+                    <li>Store the date when the achievement was unlocked</li>
+                    <li>Provide a method to unlock the achievement and set the unlock date</li>
+                </ul>
+
+                <h2 class="section-heading">Collaborations</h2>
+                <ul>
+                    <li>AchievementManager - creates, initializes, unlocks, and persists Achievement instances</li>
+                    <li>AchievementData - wraps a list of Achievement objects for JSON serialization</li>
+                    <li>Game logic - indirectly interacts with gameplay actions to unlock achievements</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: AchievementData</h1>
-                <p><strong>Responsibility</strong><br>
-                    Store saved achievement data
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Achievement
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Store a list of Achievement objects for saving/loading from JSON</li>
+                    <li>Provide a default constructor for JSON deserialization</li>
+                    <li>Provide a constructor to initialize the list of achievements</li>
+                </ul>
+
+                <h2 class="section-heading">Collaborations</h2>
+                <ul>
+                    <li>AchievementManager - creates and loads AchievementData to save/load all achievements</li>
+                    <li>Achievement - contains the individual achievements being stored</li>
+
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: AchievementNotification</h1>
-                <p><strong>Responsibility</strong><br>
-                    Show achievement pop-ups
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    Achievement
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Display a notification message when an achievement is unlocked</li>
+                    <li>Handle fade-in, display duration, and fade-out of the notification</li>
+                    <li>Render notification text in world coordinates</li>
+                    <li>Update the state of the notification each frame (timing and visibility)</li>
+                    <li>Provide information about whether a notification is active</li>
+                </ul>
+
+                <h2 class="section-heading">Collaborations</h2>
+                <ul>
+                    <li>Achievement - provides the name and description for the notification text</li>
+                    <li>Main - provides BitmapFont and world dimensions for rendering</li>
+                    <li>WorldMap - provides boundary offset for positioning notification on screen</li>
+                </ul>
             </section>
 
             <section class="card crc-card">
                 <h1>Class: AchievementScreen</h1>
-                <p><strong>Responsibility</strong><br>
-                    Display achievements
-                </p>
-                <p><strong>Collaboration</strong><br>
-                    AchievementManager, Achievement
-                </p>
+                <h2 class="section-heading">Responsibilities</h2>
+                <ul>
+                    <li>Display all game achievements (both unlocked and locked).</li>
+                    <li>Show achievement name, status (UNLOCKED/LOCKED), description, and unlock date if available.</li>
+                    <li>Provide navigation back to a previous screen (via "Back" button or ESC key).</li>
+                    <li>Manage scaling and positioning of UI elements (labels and buttons) according to screen size.
+                    </li>
+                    <li>Handle user input for UI interactions.</li>
+                </ul>
+                <h2 class="section-heading">Collaborations</h2>
+                <ul>
+                    <li>AchievementManager - retrieves the list of achievements and their status.</li>
+                    <li>Achievement - provides data for each achievement (name, description, unlocked, date).</li>
+                    <li>Main- access to game instance, viewport, font, UI skin, and world dimensions.</li>
+                    <li>HomeScreen, returnScreen - used for returning to the previous screen.</li>
+                </ul>
             </section>
 
         </div>
 
     </main>
 </body>
+
 </html>
