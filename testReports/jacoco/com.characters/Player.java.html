@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.characters</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package com.characters;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import java.util.HashMap;
+
+/** Players character manager. */
+public final class Player extends Animator {
+  // TODO: This should likely extend Actor
+
+  public final Energy energy;
+
+  /** The speed that the player moves by default. TODO: In units/second */
+<span class="nc" id="L19">  public final float baseSpeed = 8f;</span>
+
+  // Changed: store path in constant for testing
+  private final String image;
+  private final Sprite playerSprite;
+
+  /** The speed that the player moves when sprinting. TODO: In units/second */
+<span class="nc" id="L26">  private final float sprintSpeedBonus = 8f;</span>
+
+  public TextureRegion currentPlayerFrame;
+
+  /** The speed that the player moves. TODO: In units/second */
+<span class="nc" id="L31">  private float speed = baseSpeed;</span>
+
+  /** Rotation of the player sprite. */
+<span class="nc" id="L34">  private float rotation = 0f;</span>
+
+<span class="nc" id="L36">  private float woozyTimer = 0f;</span>
+<span class="nc" id="L37">  private boolean isSprint = false;</span>
+<span class="nc" id="L38">  private int verticalMovement = 0;</span>
+<span class="nc" id="L39">  private int horizontalMovement = 0;</span>
+
+  // Changed 17/12/25 to extend new animator class (all animation logic added)
+
+  /**
+   * Player constructor.
+   *
+   * @param sheetPath file path of sprite sheet
+   * @param imgPath file path of sprite img
+   */
+  public Player(String sheetPath, String imgPath) {
+<span class="nc" id="L50">    super(sheetPath, 7, 8);</span>
+<span class="nc" id="L51">    image = imgPath;</span>
+<span class="nc" id="L52">    HashMap&lt;String, Integer[]&gt; animationInfo = new HashMap&lt;String, Integer[]&gt;();</span>
+    // HashMap&lt;String, Integer[]&gt; animationInfo:
+    //      key - Name of animation
+    //      Value - Array representing row of animation on sprite sheet and index of start and end
+    // frames
+<span class="nc" id="L57">    animationInfo.put(&quot;walkForwards&quot;, new Integer[] {0, 0, 7});</span>
+<span class="nc" id="L58">    animationInfo.put(&quot;walkLeftForwards&quot;, new Integer[] {1, 0, 7});</span>
+<span class="nc" id="L59">    animationInfo.put(&quot;walkRightForwards&quot;, new Integer[] {6, 0, 7});</span>
+<span class="nc" id="L60">    animationInfo.put(&quot;walkLeft&quot;, new Integer[] {2, 0, 7});</span>
+<span class="nc" id="L61">    animationInfo.put(&quot;walkRight&quot;, new Integer[] {7, 0, 7});</span>
+<span class="nc" id="L62">    animationInfo.put(&quot;walkRightBackwards&quot;, new Integer[] {5, 0, 7});</span>
+<span class="nc" id="L63">    animationInfo.put(&quot;walkLeftBackwards&quot;, new Integer[] {3, 0, 7});</span>
+<span class="nc" id="L64">    animationInfo.put(&quot;walkBackwards&quot;, new Integer[] {4, 0, 7});</span>
+
+<span class="nc" id="L66">    generateAnimation(animationInfo, 0.3f);</span>
+
+<span class="nc" id="L68">    playerSprite = new Sprite(animations.get(&quot;walkLeftForwards&quot;).getKeyFrame(0, true));</span>
+
+<span class="nc" id="L70">    playerSprite.setOrigin(1, 1);</span>
+<span class="nc" id="L71">    this.energy = new Energy(50f);</span>
+<span class="nc" id="L72">  }</span>
+
+  /** Moves the player based on user input. */
+  public void handleInput(int windy, float delta, float randomX, float randomY) {
+    // The time since the last frame. Used to scale movement speed to keep it constant regardless of
+    // framerate.
+<span class="nc" id="L78">    Vector2 velocity = new Vector2(0, 0);</span>
+
+<span class="nc" id="L80">    verticalMovement = 0;</span>
+<span class="nc" id="L81">    horizontalMovement = 0;</span>
+    // Directional movement
+<span class="nc bnc" id="L83" title="All 4 branches missed.">    if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {</span>
+<span class="nc" id="L84">      velocity.x += 1;</span>
+<span class="nc" id="L85">      velocity.x += 1;</span>
+<span class="nc" id="L86">      horizontalMovement = 1;</span>
+<span class="nc bnc" id="L87" title="All 4 branches missed.">    } else if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {</span>
+<span class="nc" id="L88">      velocity.x -= 1;</span>
+<span class="nc" id="L89">      horizontalMovement = -1;</span>
+    }
+<span class="nc bnc" id="L91" title="All 4 branches missed.">    if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {</span>
+<span class="nc" id="L92">      velocity.y += 1;</span>
+<span class="nc" id="L93">      verticalMovement = 1;</span>
+<span class="nc bnc" id="L94" title="All 4 branches missed.">    } else if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {</span>
+<span class="nc" id="L95">      velocity.y -= 1;</span>
+<span class="nc" id="L96">      verticalMovement = -1;</span>
+    }
+    // Sprint
+<span class="nc bnc" id="L99" title="All 2 branches missed.">    if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        &amp;&amp; energy.isAccessible()</span>
+<span class="nc bnc" id="L101" title="All 4 branches missed.">        &amp;&amp; !velocity.isZero()</span>
+        &amp;&amp; !isSprint) {
+<span class="nc" id="L103">      setSpeed(speed + sprintSpeedBonus);</span>
+<span class="nc" id="L104">      energy.reduceEnergy(delta * 4);</span>
+<span class="nc" id="L105">      energy.regenerating = false;</span>
+<span class="nc" id="L106">      isSprint = true;</span>
+    } else {
+<span class="nc bnc" id="L108" title="All 2 branches missed.">      if (isSprint) {</span>
+<span class="nc" id="L109">        setSpeed(speed - sprintSpeedBonus);</span>
+<span class="nc" id="L110">        isSprint = false;</span>
+      }
+<span class="nc bnc" id="L112" title="All 2 branches missed.">      if (!Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)) {</span>
+<span class="nc" id="L113">        energy.regenerating = true;</span>
+      }
+    }
+    // Normalise the vector so that diagonal movement isn't sqrt(2) times faster.
+<span class="nc" id="L117">    velocity.nor();</span>
+    // Scale the vector according to speed
+<span class="nc" id="L119">    velocity.scl(speed * delta);</span>
+
+    // Changed 10/12/25 to add wind resistance
+<span class="nc bnc" id="L122" title="All 2 branches missed.">    if (horizontalMovement == 0) {</span>
+<span class="nc" id="L123">      velocity.x += (windy * 0.05f);</span>
+    } else {
+<span class="nc" id="L125">      velocity.x += (windy * 0.13f);</span>
+    }
+
+    // changed 28/12/25 to add woozy event
+<span class="nc bnc" id="L129" title="All 2 branches missed.">    if (woozyTimer &gt; 0) {</span>
+<span class="nc" id="L130">      woozyTimer -= delta;</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">      if (!velocity.isZero()) {</span>
+<span class="nc" id="L132">        velocity.x += randomX;</span>
+<span class="nc" id="L133">        velocity.y += randomY;</span>
+      }
+<span class="nc bnc" id="L135" title="All 2 branches missed.">      if (woozyTimer &lt;= 0) {</span>
+<span class="nc" id="L136">        resetSpeed();</span>
+      }
+    }
+<span class="nc" id="L139">    move(velocity);</span>
+<span class="nc" id="L140">  }</span>
+
+  /**
+   * Update player animation Added 17/12/25 to control new animations.
+   *
+   * @param stateTime time in seconds since last frame
+   */
+  public void updatePlayer(float stateTime) {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">    if (verticalMovement == 1) {</span>
+<span class="nc bnc" id="L149" title="All 4 branches missed.">      switch (horizontalMovement) {</span>
+        case 0:
+<span class="nc" id="L151">          currentPlayerFrame = animations.get(&quot;walkBackwards&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L152">          break;</span>
+        case 1:
+<span class="nc" id="L154">          currentPlayerFrame = animations.get(&quot;walkRightBackwards&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L155">          break;</span>
+        case -1:
+<span class="nc" id="L157">          currentPlayerFrame = animations.get(&quot;walkLeftBackwards&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L158">          break;</span>
+        default:
+<span class="nc" id="L160">          throw new IllegalStateException(&quot;Unexpected value: &quot; + horizontalMovement);</span>
+      }
+<span class="nc bnc" id="L162" title="All 2 branches missed.">    } else if (verticalMovement == -1) {</span>
+<span class="nc bnc" id="L163" title="All 4 branches missed.">      switch (horizontalMovement) {</span>
+        case 0:
+<span class="nc" id="L165">          currentPlayerFrame = animations.get(&quot;walkForwards&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L166">          break;</span>
+        case 1:
+<span class="nc" id="L168">          currentPlayerFrame = animations.get(&quot;walkRightForwards&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L169">          break;</span>
+        case -1:
+<span class="nc" id="L171">          currentPlayerFrame = animations.get(&quot;walkLeftForwards&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L172">          break;</span>
+        default:
+<span class="nc" id="L174">          throw new IllegalStateException(&quot;Unexpected value: &quot; + horizontalMovement);</span>
+      }
+<span class="nc bnc" id="L176" title="All 2 branches missed.">    } else if (verticalMovement == 0) {</span>
+<span class="nc bnc" id="L177" title="All 4 branches missed.">      switch (horizontalMovement) {</span>
+        case 0:
+<span class="nc" id="L179">          currentPlayerFrame = new TextureRegion(new Texture(Gdx.files.internal(image)));</span>
+<span class="nc" id="L180">          break;</span>
+        case 1:
+<span class="nc" id="L182">          currentPlayerFrame = animations.get(&quot;walkRight&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L183">          break;</span>
+        case -1:
+<span class="nc" id="L185">          currentPlayerFrame = animations.get(&quot;walkLeft&quot;).getKeyFrame(stateTime, true);</span>
+<span class="nc" id="L186">          break;</span>
+        default:
+<span class="nc" id="L188">          throw new IllegalStateException(&quot;Unexpected value: &quot; + horizontalMovement);</span>
+      }
+    }
+
+<span class="nc" id="L192">    playerSprite.setSize(1.3f, 2.7f);</span>
+<span class="nc" id="L193">    playerSprite.setRegion(currentPlayerFrame);</span>
+<span class="nc" id="L194">  }</span>
+
+  /** Call after drinking too many energy drinks, makes player woozy. */
+  public void sugarCrash() {
+<span class="nc" id="L198">    woozyTimer = 10;</span>
+<span class="nc" id="L199">    setSpeed(2);</span>
+<span class="nc" id="L200">  }</span>
+
+  /**
+   * Render the player to the screen.
+   *
+   * @param batch The SpriteBatch to render to
+   */
+  public void render(SpriteBatch batch) {
+<span class="nc" id="L208">    playerSprite.setRotation(</span>
+        rotation); // rotation is rendered so must be checked on every render call
+<span class="nc" id="L210">    playerSprite.draw(batch);</span>
+<span class="nc" id="L211">  }</span>
+
+  /**
+   * Get player sprite.
+   *
+   * @return The player sprite
+   */
+  public Sprite getSprite() {
+<span class="nc" id="L219">    return playerSprite;</span>
+  }
+
+  /**
+   * Get player speed.
+   *
+   * @return The current speed of the player
+   */
+  public float getSpeed() {
+<span class="nc" id="L228">    return speed;</span>
+  }
+
+  /**
+   * Set the speed of the player.
+   *
+   * @param speed The new value of speed
+   */
+  public void setSpeed(float speed) {
+<span class="nc" id="L237">    this.speed = speed;</span>
+<span class="nc" id="L238">  }</span>
+
+  /** Reset speed to `BASE_SPEED`. */
+  public void resetSpeed() {
+<span class="nc" id="L242">    this.speed = baseSpeed;</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">    if (isSprint) {</span>
+<span class="nc" id="L244">      this.speed += sprintSpeedBonus;</span>
+    }
+<span class="nc" id="L246">  }</span>
+
+  /**
+   * Get player position.
+   *
+   * @return The player sprite position
+   */
+  public Vector2 getPosition() {
+<span class="nc" id="L254">    Vector2 position = new Vector2();</span>
+<span class="nc" id="L255">    return playerSprite.getBoundingRectangle().getPosition(position);</span>
+  }
+
+  /**
+   * Set the position of the player sprite.
+   *
+   * @param position The new position for the sprite.
+   */
+  public void setPosition(Vector2 position) {
+<span class="nc" id="L264">    setPosition(position.x, position.y);</span>
+<span class="nc" id="L265">  }</span>
+
+  /**
+   * Set the position of the player sprite.
+   *
+   * @param x The new x-position for the sprite.
+   * @param y The new y-position for the sprite.
+   */
+  public void setPosition(float x, float y) {
+<span class="nc" id="L274">    playerSprite.setPosition(x, y);</span>
+<span class="nc" id="L275">  }</span>
+
+  /**
+   * Get player rotation.
+   *
+   * @return rotation multiplier
+   */
+  public float getRotation() {
+<span class="nc" id="L283">    return rotation;</span>
+  }
+
+  /**
+   * Set rotation of the player.
+   *
+   * @param rotation rotation multiplier
+   */
+  public void setRotation(float rotation) {
+<span class="nc" id="L292">    this.rotation = rotation;</span>
+<span class="nc" id="L293">  }</span>
+
+  /**
+   * Move the player sprite.
+   *
+   * @param x The amount to move the sprite on the x-axis.
+   * @param y The amount to move the sprite on the y-axis
+   */
+  public void move(float x, float y) {
+<span class="nc" id="L302">    playerSprite.translate(x, y);</span>
+<span class="nc" id="L303">  }</span>
+
+  /**
+   * Move the player sprite.
+   *
+   * @param vector The vector to move the player by
+   */
+  public void move(Vector2 vector) {
+<span class="nc" id="L311">    move(vector.x, vector.y);</span>
+<span class="nc" id="L312">  }</span>
+
+  /** Releases all resources of this object. */
+  public void dispose() {
+    // Nothing to dispose currently.
+<span class="nc" id="L317">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

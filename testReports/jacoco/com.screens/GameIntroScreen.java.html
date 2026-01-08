@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameIntroScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.screens</a> &gt; <span class="el_source">GameIntroScreen.java</span></div><h1>GameIntroScreen.java</h1><pre class="source lang-java linenums">package com.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.mazegame.Main;
+import com.rooms.WorldMap;
+
+/** Game intro and explanation screen. [05/01/2026]-Added this screen for context */
+public class GameIntroScreen extends ScreenAdapter {
+  private static final float BUTTON_WIDTH = 180f;
+  private static final float BUTTON_HEIGHT = 60f;
+  private final Main game;
+  private final String sheet;
+  private final String img;
+  private Stage stage;
+  private Label titleLabel;
+  private TextButton playButton;
+
+  /**
+   * Initialise screen.
+   *
+   * @param game current instance of Main
+   * @param sheet selected sprite sheet
+   * @param img selected sprite image
+   */
+<span class="nc" id="L34">  public GameIntroScreen(Main game, String sheet, String img) {</span>
+<span class="nc" id="L35">    this.game = game;</span>
+<span class="nc" id="L36">    this.sheet = sheet;</span>
+<span class="nc" id="L37">    this.img = img;</span>
+<span class="nc" id="L38">  }</span>
+
+  @Override
+  public void show() {
+<span class="nc" id="L42">    stage = new Stage(new ScreenViewport());</span>
+<span class="nc" id="L43">    Gdx.input.setInputProcessor(stage);</span>
+
+<span class="nc" id="L45">    titleLabel =</span>
+        new Label(
+            &quot;The duck statue has been stolen and hidden around campus. &quot;
+                + &quot;Currently you are to blame and must reassemble the statue to prove your &quot;
+                + &quot;innocence. Don't let campus security catch you with part of the statue &quot;
+                + &quot;though as this may reinforce their mistrust.&quot;,
+            Main.labelStyle);
+
+<span class="nc" id="L53">    titleLabel.setColor(new Color(1f, 1f, 0f, 1f));</span>
+<span class="nc" id="L54">    titleLabel.setWrap(true);</span>
+<span class="nc" id="L55">    titleLabel.setWidth(Main.WORLD_WIDTH - (WorldMap.BOUNDARY_WIDTH * 2f));</span>
+
+<span class="nc" id="L57">    playButton = new TextButton(&quot;Play&quot;, Main.uiSkin);</span>
+<span class="nc" id="L58">    playButton.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">    if (playButton.getLabel() != null) {</span>
+<span class="nc" id="L60">      playButton.getLabel().setWrap(true);</span>
+    }
+<span class="nc" id="L62">    playButton.addListener(</span>
+<span class="nc" id="L63">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L66">            game.setScreen(new WorldScreen(game, sheet, img));</span>
+<span class="nc" id="L67">          }</span>
+        });
+
+<span class="nc" id="L70">    stage.addActor(titleLabel);</span>
+<span class="nc" id="L71">    stage.addActor(playButton);</span>
+
+<span class="nc" id="L73">    updatePositions(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());</span>
+<span class="nc" id="L74">  }</span>
+
+  private void updatePositions(float screenWidth, float screenHeight) {
+<span class="nc" id="L77">    float centerX = screenWidth / 2f;</span>
+
+    float scaleX =
+<span class="nc bnc" id="L80" title="All 4 branches missed.">        screenWidth &gt; 0 &amp;&amp; Main.VIEWPORT_SIZE.x &gt; 0 ? screenWidth / Main.VIEWPORT_SIZE.x : 1f;</span>
+    float scaleY =
+<span class="nc bnc" id="L82" title="All 4 branches missed.">        screenHeight &gt; 0 &amp;&amp; Main.VIEWPORT_SIZE.y &gt; 0 ? screenHeight / Main.VIEWPORT_SIZE.y : 1f;</span>
+<span class="nc" id="L83">    float fontScale = Math.max(0.1f, Math.min(scaleX, scaleY));</span>
+
+<span class="nc" id="L85">    float titleY = screenHeight * 0.6f;</span>
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">    if (titleLabel != null) {</span>
+<span class="nc" id="L88">      titleLabel.setWidth(screenWidth * 0.9f);</span>
+<span class="nc" id="L89">      titleLabel.setFontScale(fontScale);</span>
+<span class="nc" id="L90">      titleLabel.setPosition(centerX - titleLabel.getWidth() / 2f, titleY);</span>
+    }
+
+<span class="nc bnc" id="L93" title="All 2 branches missed.">    if (playButton != null) {</span>
+<span class="nc" id="L94">      playButton.setSize(BUTTON_WIDTH * fontScale, BUTTON_HEIGHT * fontScale);</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">      if (playButton.getLabel() != null) {</span>
+<span class="nc" id="L96">        float buttonHeight = BUTTON_HEIGHT * fontScale;</span>
+<span class="nc" id="L97">        float buttonWidth = BUTTON_WIDTH * fontScale;</span>
+<span class="nc" id="L98">        float maxFontScaleByHeight = (buttonHeight * 0.6f) / 15f;</span>
+<span class="nc" id="L99">        float maxFontScaleByWidth = (buttonWidth * 0.8f) / 30f;</span>
+<span class="nc" id="L100">        float buttonFontScale =</span>
+<span class="nc" id="L101">            Math.min(fontScale * 1.5f, Math.min(maxFontScaleByHeight, maxFontScaleByWidth));</span>
+<span class="nc" id="L102">        playButton.getLabel().setFontScale(buttonFontScale);</span>
+<span class="nc" id="L103">        playButton.getLabel().setWrap(true);</span>
+      }
+<span class="nc" id="L105">      playButton.setPosition(centerX - playButton.getWidth() / 2f, screenHeight * 0.08f);</span>
+    }
+<span class="nc" id="L107">  }</span>
+
+  @Override
+  public void render(float delta) {
+<span class="nc" id="L111">    Gdx.gl.glClearColor(0.15f, 0.18f, 0.25f, 1);</span>
+<span class="nc" id="L112">    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);</span>
+
+<span class="nc" id="L114">    game.getViewport().apply();</span>
+<span class="nc" id="L115">    stage.act(delta);</span>
+
+<span class="nc" id="L117">    stage.draw();</span>
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">    if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {</span>
+<span class="nc" id="L120">      game.setScreen(new HomeScreen(game));</span>
+    }
+<span class="nc" id="L122">  }</span>
+
+  @Override
+  public void resize(int width, int height) {
+<span class="nc bnc" id="L126" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L127">      stage.getViewport().update(width, height, true);</span>
+<span class="nc" id="L128">      updatePositions(width, height);</span>
+    }
+<span class="nc" id="L130">  }</span>
+
+  @Override
+  public void dispose() {
+<span class="nc bnc" id="L134" title="All 2 branches missed.">    if (stage != null) {</span>
+<span class="nc" id="L135">      stage.dispose();</span>
+    }
+<span class="nc" id="L137">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>

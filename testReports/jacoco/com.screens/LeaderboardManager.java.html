@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LeaderboardManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.screens</a> &gt; <span class="el_source">LeaderboardManager.java</span></div><h1>LeaderboardManager.java</h1><pre class="source lang-java linenums">package com.screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Manages the local leaderboard functionality. Handles saving and loading scores from a local JSON.
+ * file. [21/12/2025] - Added this class to handle saving and loading leaderboard scores from local
+ * storage
+ */
+public class LeaderboardManager {
+  /** The file path for storing leaderboard data. */
+  private static final String LEADERBOARD_FILE = &quot;assets/leaderboard.json&quot;;
+
+  /** Maximum number of scores to keep in the leaderboard. */
+  private static final int MAX_SCORES = 10;
+
+  /** JSON instance for serialization/deserialization. */
+  private final Json json;
+
+  /** Constructs a new LeaderboardManager. */
+<span class="fc" id="L28">  public LeaderboardManager() {</span>
+<span class="fc" id="L29">    this.json = new Json();</span>
+    // Configure Json for proper List serialization because we need to ensure Lists are correctly
+    // serialized
+<span class="fc" id="L32">    this.json.setOutputType(JsonWriter.OutputType.json);</span>
+<span class="fc" id="L33">  }</span>
+
+  /**
+   * Adds a new score to the leaderboard. The score will be saved automatically after being added.
+   *
+   * @param score The final score accumulated when the game is completed
+   * @param time The time remaining when the game was completed
+   */
+  public void addScore(int score, float time) {
+<span class="fc" id="L42">    addScore(score, time, &quot;Player&quot;); // Default name for backward compatibility</span>
+<span class="fc" id="L43">  }</span>
+
+  /**
+   * Adds a new score to the leaderboard with player name. The score will be saved automatically
+   * after being added.
+   *
+   * @param score The final score accumulated when the game is completed
+   * @param time The time remaining when the game was completed
+   * @param playerName The name of the player who achieved this score
+   */
+  public void addScore(int score, float time, String playerName) {
+    // Change [04/01/2026] - Added player name parameter to store player name with score
+<span class="fc" id="L55">    List&lt;ScoreEntry&gt; scores = loadScores();</span>
+
+    // Create new score entry with current date and player name
+<span class="fc" id="L58">    String currentDate = getCurrentDateString();</span>
+<span class="fc" id="L59">    ScoreEntry newEntry = new ScoreEntry(score, currentDate, time, playerName);</span>
+
+    // Add to list
+<span class="fc" id="L62">    scores.add(newEntry);</span>
+
+    // Added sorting and limiting because we need to keep only the top scores
+<span class="fc" id="L65">    sortScores(scores);</span>
+<span class="fc" id="L66">    limitScores(scores);</span>
+
+    // Save the updated list
+<span class="fc" id="L69">    saveScores(scores);</span>
+<span class="fc" id="L70">  }</span>
+
+  /**
+   * Retrieves the top scores from the leaderboard.
+   *
+   * @param limit Maximum number of scores to return
+   * @return A list of ScoreEntry objects, sorted by score (descending)
+   */
+  public List&lt;ScoreEntry&gt; getTopScores(int limit) {
+    // Added this method implementation because we need to retrieve top scores from the leaderboard
+<span class="fc" id="L80">    List&lt;ScoreEntry&gt; scores = loadScores();</span>
+
+    // Filter to keep only entries with complete date-time because user requested to keep only
+    // complete time data
+<span class="fc" id="L84">    List&lt;ScoreEntry&gt; completeTimeScores = filterCompleteTimeEntries(scores);</span>
+
+    // Remove duplicate score values, keeping the most recent date because user requested no
+    // duplicate score
+
+    // Added sorting because we need to ensure scores are sorted before returning
+<span class="fc" id="L90">    sortScores(completeTimeScores);</span>
+
+    // Limit the number of results
+<span class="fc" id="L93">    List&lt;ScoreEntry&gt; result = completeTimeScores;</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">    if (result.size() &gt; limit) {</span>
+<span class="fc" id="L95">      result = result.subList(0, limit);</span>
+    }
+
+<span class="fc" id="L98">    return result;</span>
+  }
+
+  /**
+   * Filters the score list to keep only entries with complete date-time information.
+   *
+   * @param scores The list of scores to filter
+   * @return A list containing only scores with complete date-time (format: &quot;yyyy-MM-dd HH:mm:ss&quot;)
+   */
+  private List&lt;ScoreEntry&gt; filterCompleteTimeEntries(List&lt;ScoreEntry&gt; scores) {
+    // Added this method because user requested to keep only entries with complete time data
+<span class="fc" id="L109">    List&lt;ScoreEntry&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L110">    SimpleDateFormat dateTimeFormat = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);</span>
+
+<span class="fc bfc" id="L112" title="All 2 branches covered.">    for (ScoreEntry entry : scores) {</span>
+<span class="pc bpc" id="L113" title="2 of 4 branches missed.">      if (entry == null || entry.date == null) {</span>
+<span class="nc" id="L114">        continue;</span>
+      }
+
+      // Try to parse as complete date-time format
+      try {
+<span class="fc" id="L119">        dateTimeFormat.parse(entry.date);</span>
+        // If parsing succeeds, it has complete time, so add it
+<span class="fc" id="L121">        result.add(entry);</span>
+<span class="nc" id="L122">      } catch (ParseException e) {</span>
+        // If parsing fails, it doesn't have complete time, so skip it
+<span class="nc" id="L124">        Gdx.app.log(&quot;LeaderboardManager&quot;, &quot;Skipping entry with incomplete time: &quot; + entry.date);</span>
+<span class="fc" id="L125">      }</span>
+<span class="fc" id="L126">    }</span>
+
+<span class="fc" id="L128">    return result;</span>
+  }
+
+  /**
+   * Saves the current leaderboard scores to local storage.
+   *
+   * @param scores The list of scores to save
+   */
+  private void saveScores(List&lt;ScoreEntry&gt; scores) {
+    // Added this method implementation because we need to save scores to a local JSON file
+    try {
+<span class="fc" id="L139">      LeaderboardData data = new LeaderboardData(scores);</span>
+      // Use setOutputType for proper JSON formatting because we need clean JSON output
+<span class="fc" id="L141">      json.setOutputType(JsonWriter.OutputType.json);</span>
+<span class="fc" id="L142">      String jsonString = json.toJson(data);</span>
+
+      // Use local() instead of internal() because we need write access
+<span class="fc" id="L145">      Gdx.files.local(LEADERBOARD_FILE).writeString(jsonString, false);</span>
+      // Log success for debugging because we need to verify data is being saved
+<span class="fc" id="L147">      Gdx.app.log(&quot;LeaderboardManager&quot;, &quot;Saved &quot; + scores.size() + &quot; scores to leaderboard&quot;);</span>
+<span class="nc" id="L148">    } catch (Exception e) {</span>
+      // Log error but don't crash the game
+<span class="nc" id="L150">      Gdx.app.error(&quot;LeaderboardManager&quot;, &quot;Failed to save scores&quot;, e);</span>
+<span class="fc" id="L151">    }</span>
+<span class="fc" id="L152">  }</span>
+
+  /**
+   * Loads the leaderboard scores from local storage.
+   *
+   * @return A list of ScoreEntry objects, or an empty list if the file doesn't exist
+   */
+  private List&lt;ScoreEntry&gt; loadScores() {
+    // Added this method implementation because we need to load scores from a local JSON file
+    try {
+      // Check if file exists
+<span class="fc bfc" id="L163" title="All 2 branches covered.">      if (!Gdx.files.local(LEADERBOARD_FILE).exists()) {</span>
+<span class="fc" id="L164">        Gdx.app.log(&quot;LeaderboardManager&quot;, &quot;Leaderboard file does not exist&quot;);</span>
+<span class="fc" id="L165">        return new ArrayList&lt;&gt;();</span>
+      }
+
+      // Read file content
+<span class="fc" id="L169">      String fileContent = Gdx.files.local(LEADERBOARD_FILE).readString();</span>
+
+      // Deserialize JSON with proper type handling because libGDX Json needs to know List element
+      // type
+      // Use fromJson with explicit type information similar to WorldMap pattern
+<span class="fc" id="L174">      LeaderboardData data = json.fromJson(LeaderboardData.class, fileContent);</span>
+
+      // Ensure scores list is properly initialized because deserialization might return null list
+<span class="pc bpc" id="L177" title="1 of 2 branches missed.">      if (data == null) {</span>
+<span class="nc" id="L178">        Gdx.app.error(</span>
+            &quot;LeaderboardManager&quot;, &quot;Failed to deserialize leaderboard data - data is null&quot;);
+<span class="nc" id="L180">        return new ArrayList&lt;&gt;();</span>
+      }
+
+<span class="pc bpc" id="L183" title="1 of 2 branches missed.">      if (data.scores == null) {</span>
+<span class="nc" id="L184">        Gdx.app.error(</span>
+            &quot;LeaderboardManager&quot;,
+            &quot;Failed to deserialize leaderboard data - scores list is null, &quot;
+                + &quot;initializing empty list&quot;);
+<span class="nc" id="L188">        data.scores = new ArrayList&lt;&gt;();</span>
+      }
+
+      // Change [04/01/2026] - Migrate old data: estimate timeLeft from score if missing because old
+      // JSON entries don't have timeLeft
+<span class="fc" id="L193">      List&lt;ScoreEntry&gt; result = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L194">      boolean dataMigrated = false;</span>
+<span class="fc bfc" id="L195" title="All 2 branches covered.">      for (ScoreEntry entry : data.scores) {</span>
+<span class="pc bpc" id="L196" title="2 of 4 branches missed.">        if (entry != null &amp;&amp; entry.date != null) {</span>
+
+<span class="fc" id="L198">          result.add(entry);</span>
+        }
+<span class="fc" id="L200">      }</span>
+
+      // Log loaded scores count for debugging because we need to verify data is being loaded
+<span class="fc" id="L203">      Gdx.app.log(</span>
+          &quot;LeaderboardManager&quot;,
+          &quot;Loaded &quot;
+<span class="fc" id="L206">              + result.size()</span>
+              + &quot; scores from leaderboard (file had &quot;
+<span class="fc" id="L208">              + data.scores.size()</span>
+              + &quot; entries)&quot;);
+<span class="fc" id="L210">      return result;</span>
+<span class="nc" id="L211">    } catch (Exception e) {</span>
+      // Log error but don't crash the game
+<span class="nc" id="L213">      Gdx.app.error(&quot;LeaderboardManager&quot;, &quot;Failed to load scores: &quot; + e.getMessage(), e);</span>
+<span class="nc" id="L214">      return new ArrayList&lt;&gt;();</span>
+    }
+  }
+
+  /**
+   * Sorts the scores by score in descending order (highest score first).
+   *
+   * @param scores The list of scores to sort
+   */
+  private void sortScores(List&lt;ScoreEntry&gt; scores) {
+    // Added this method implementation because we need to sort scores by time remaining in
+    // descending order
+<span class="fc" id="L226">    scores.sort(</span>
+        (a, b) -&gt; {
+          // Compare in descending order (higher score is better)
+<span class="fc" id="L229">          return Double.compare(b.score, a.score);</span>
+        });
+<span class="fc" id="L231">  }</span>
+
+  /**
+   * Limits the number of scores to the maximum allowed.
+   *
+   * @param scores The list of scores to limit
+   */
+  private void limitScores(List&lt;ScoreEntry&gt; scores) {
+    // Added this method implementation because we need to keep only the top MAX_SCORES entries
+<span class="fc bfc" id="L240" title="All 2 branches covered.">    if (scores.size() &gt; MAX_SCORES) {</span>
+      // Remove entries beyond the maximum allowed
+<span class="fc" id="L242">      scores.subList(MAX_SCORES, scores.size()).clear();</span>
+    }
+<span class="fc" id="L244">  }</span>
+
+  /**
+   * Gets the current date as a formatted string.
+   *
+   * @return A string representing the current date and time in &quot;yyyy-MM-dd HH:mm:ss&quot; format
+   */
+  private String getCurrentDateString() {
+    // Added this method because we need to format the current date and time for score entries
+<span class="fc" id="L253">    SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;yyyy-MM-dd&quot;);</span>
+<span class="fc" id="L254">    return dateFormat.format(new Date());</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
