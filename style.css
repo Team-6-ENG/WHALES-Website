@@ -164,13 +164,19 @@ hr {
 .dropdown{ position: relative; }
 
 .dropdown:hover > .dropdown-menu{ display:flex; }
-
+.dropdown::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    height: 16px;
+}
 .dropdown-menu{
   display:none;
   position:absolute;
   top:44px;
-  left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-5%);
   background:white;
   border:1px solid rgba(0,0,0,0.15);
   border-radius:12px;
@@ -178,10 +184,9 @@ hr {
   z-index:999;
   padding:10px;
 
-  flex-direction: row;
+  flex-direction: column;
   gap: 14px;
   align-items: flex-start;
-  min-width: 520px;
 }
 
 .dropdown-menu > a,
@@ -190,7 +195,6 @@ hr {
   border: 1px solid rgba(0,0,0,0.08);
   border-radius: 10px;
   padding: 10px;
-  min-width: 170px;
 }
 
 .dropdown-menu a{
@@ -290,4 +294,15 @@ hr {
 
 a{
   color: blueviolet;
+}
+
+.crc-card {
+    border: 3px solid rgb(200, 155, 241);
+    
+}
+
+.crc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(48%, 1fr));
+    gap: 20px;
 }
