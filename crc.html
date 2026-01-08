@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QUACK? | CRC Cards</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css'>
+</head>
+
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <div class="site-title">QUACK?</div>
+            <div class="site-subtitle">ENG1 Project - Cohort 4 Team 6, inherited from Team 1</div>
+        </div>
+
+        <nav class="tabs">
+            <a class="tab" href="index.html">Overview</a>
+
+            <a class="tab" href="deliverables.html">Project Documents</a>
+            <div class="tab dropdown active">
+                <div tabindex="0">Architecture Design ▶</div>
+                <div class="dropdown-menu">
+                    <a class = "active" href="">CRC cards</a>
+                    <a href="#">CRC to requirements map</a>
+                    <a href="#">Sequence Diagrams</a>
+                    <a href="#">Class Diagrams</a>
+                </div>
+            </div>
+
+            <a class="tab" href="planning.html">Planning</a>
+            <a class="tab" href="interviews.html">Interviews</a>
+            <a class="tab" href="attributions.html">Attributions</a>
+            <a class="tab" href="https://whales-game.netlify.app" target="_blank">Assessment 1 Website</a>
+        </nav>
+    </div>
+
+ <main class="page">
+
+        <!-- Grid layout -->
+        <div class="crc-grid">
+
+            <section class="card crc-card">
+                <h1>Class: Main</h1>
+                <p><strong>Responsibility</strong><br>
+                    Start the game, set and change screens, control the overall game flow
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    HomeScreen, WorldScreen, WinScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Player</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store player information, update player state, allow events to change player values
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    WorldScreen, Energy, Animator
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Energy</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store the player’s energy value, increase or decrease energy
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Player
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Animator</h1>
+                <p><strong>Responsibility</strong><br>
+                    Load animations, update animation frames
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Player, Frog, Security
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: WorldMap</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store the game world layout, track the player’s current room, control movement between rooms
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    JsonRoom, JsonObstacle, OrthogonalDirection, Obstacle
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: JsonRoom</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store room data loaded from JSON, hold room description and exits
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    JsonObstacle, OrthogonalDirection
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: JsonObstacle</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store obstacle data from JSON
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    JsonRoom, WorldMap
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Interface: Event</h1>
+                <p><strong>Responsibility</strong><br>
+                    Base structure for all events, shared behavior for displaying text and applying effects
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Player, WorldScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: HomeScreen</h1>
+                <p><strong>Responsibility</strong><br>
+                    Display the main menu UI, handle menu navigation
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    NameInputScreen, LeaderboardScreen, AchievementsScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Item</h1>
+                <p><strong>Responsibility</strong><br>
+                    Represent a usable or collectable item
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    ItemType, Obstacle
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Frog</h1>
+                <p><strong>Responsibility</strong><br>
+                    Control frog behaviour and interaction events
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Animator, Player, Main, WorldScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Security</h1>
+                <p><strong>Responsibility</strong><br>
+                    Control the campus security character, apply penalties
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    WorldMap, WorldScreen, DuckStatue
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: SlipOnCoffee</h1>
+                <p><strong>Responsibility</strong><br>
+                    Handle the coffee slip event and apply effects
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Player, WorldScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: DuckStatue</h1>
+                <p><strong>Responsibility</strong><br>
+                    Control the duck statue event and check progress
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    DuckStatuePiece, WorldMap, Main
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: DuckStatuePiece</h1>
+                <p><strong>Responsibility</strong><br>
+                    Represent a statue piece and support the statue event
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    WorldMap, Main
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: HiddenEvent</h1>
+                <p><strong>Responsibility</strong><br>
+                    Base for background events
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    WorldScreen, Event
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: PowerCut</h1>
+                <p><strong>Responsibility</strong><br>
+                    Apply a random power cut effect in Piazza
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    HiddenEvent, Main
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: RamblingProfessorEvent</h1>
+                <p><strong>Responsibility</strong><br>
+                    Control the professor event
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    HiddenEvent, Main
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: WindEvent</h1>
+                <p><strong>Responsibility</strong><br>
+                    Apply wind effects during gameplay
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    HiddenEvent, Main
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: NameInputScreen</h1>
+                <p><strong>Responsibility</strong><br>
+                    Get the player’s name
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Main, HomeScreen, GameIntroScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: GameIntroScreen</h1>
+                <p><strong>Responsibility</strong><br>
+                    Show the game introduction and start the game world
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Main, WorldScreen, WorldMap, HomeScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: WinScreen</h1>
+                <p><strong>Responsibility</strong><br>
+                    Show the win screen and handle input
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    HomeScreen, Main, LeaderboardManager, AchievementManager
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: AudioManager</h1>
+                <p><strong>Responsibility</strong><br>
+                    Load and play sounds and music
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    WorldScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Timer</h1>
+                <p><strong>Responsibility</strong><br>
+                    Track elapsed or countdown time
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    WorldScreen
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Score</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store and manage the player’s score
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Main, LeaderboardManager
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: LeaderboardManager</h1>
+                <p><strong>Responsibility</strong><br>
+                    Save, load, and sort leaderboard entries
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    LeaderboardData, ScoreEntry
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: LeaderboardData</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store leaderboard information
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    ScoreEntry
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: ScoreEntry</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store one player score
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    LeaderboardData
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: AchievementManager</h1>
+                <p><strong>Responsibility</strong><br>
+                    Track achievement progress and unlock achievements
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Achievement, AchievementData
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Achievement</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store one achievement
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    AchievementManager
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: AchievementData</h1>
+                <p><strong>Responsibility</strong><br>
+                    Store saved achievement data
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Achievement
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: AchievementNotification</h1>
+                <p><strong>Responsibility</strong><br>
+                    Show achievement pop-ups
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    Achievement
+                </p>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: AchievementScreen</h1>
+                <p><strong>Responsibility</strong><br>
+                    Display achievements
+                </p>
+                <p><strong>Collaboration</strong><br>
+                    AchievementManager, Achievement
+                </p>
+            </section>
+
+        </div>
+
+    </main>
+</body>
+</html>
