@@ -1,0 +1,1179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WorldScreen.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">com.screens</a> &gt; <span class="el_source">WorldScreen.java</span></div><h1>WorldScreen.java</h1><pre class="source lang-java linenums">package com.screens;
+
+import com.audio.AudioManager;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.mazegame.Main;
+import com.characters.Player;
+import com.events.DuckStatue;
+import com.events.DuckStatuePiece;
+import com.events.Event;
+import com.events.Frog;
+import com.events.Item;
+import com.events.ItemType;
+import com.events.Obstacle;
+import com.events.Security;
+import com.events.SlipOnCoffee;
+import com.events.hiddenevents.HiddenEvent;
+import com.events.hiddenevents.PowerCut;
+import com.events.hiddenevents.RamblingProfessorEvent;
+import com.events.hiddenevents.WindEvent;
+import com.rooms.OrthogonalDirection;
+import com.rooms.WorldMap;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Random;
+
+/** A screen which displays the game world, usually displays a Room. */
+public class WorldScreen extends ScreenAdapter {
+  public static final String PAUSE_IMG = &quot;screens/pauseOverlay.png&quot;;
+  public static final String INSTRUCTION_IMG = &quot;screens/instructionOverlay.png&quot;;
+  public static final String VENDING_IMG = &quot;items/vendingMachine.png&quot;;
+  public static final String DRINK_IMG = &quot;items/energyDrink.png&quot;;
+  public static final String MAP_IMG = &quot;items/EastCampusMap.png&quot;;
+  public static final String BRICK_HORIZONTAL_IMG = &quot;items/brickHorizontal.png&quot;;
+  public static final String BRICK_VERTICAL_IMG = &quot;items/brickVertical.png&quot;;
+  public static final String PIAZZA_ROOM = &quot;Piazza&quot;;
+<span class="fc" id="L52">  public static final Vector2 POWERCUT_POSITION = new Vector2(5, 3);</span>
+  private static final float SPEED_RUNNER_TIME_LIMIT =
+      180f; // 3 minutes in seconds for Speed Runner
+  private static final float TEACHERS_PET_TIME_REQUIRED = 15f; // 15 seconds for Teacher's Pet
+  public final Player player;
+  private final Main game;
+  private final WorldMap worldMap;
+  private final Timer timer;
+  private final Score score;
+  private final Label hiddenEventLabel;
+  private final Label negativeEventLabel;
+  private final Label positiveEventLabel;
+  private final Label mapInstructionsLabel;
+  private final Label frogLabel;
+  private final Label professorLabel;
+  private final Texture pauseOverlay;
+  private final Texture instructionOverlay;
+  // All map related code added 1/1/26 for additional requirement
+  private final Texture mapOverlay;
+  private final Texture brickHorizontalTexture;
+  private final Texture brickVerticalTexture;
+  private final PowerCut powerCutEvent;
+  // Wind event and all logic added for part 2
+  private final WindEvent windEvent;
+
+  /** Currently loaded items. */
+  private final ArrayList&lt;Item&gt; items;
+
+  private final SlipOnCoffee coffeeEvent;
+  private final DuckStatue duckStatue;
+  // All frog related code added 02/01/2026 for additional negative event
+<span class="nc" id="L83">  private final Frog frog = new Frog();</span>
+  // All campus security code added 31/12/2025 for additional negative event
+<span class="nc" id="L85">  private final Security security = new Security();</span>
+  // All professor related code added 28/12/2025 for additional hidden event
+  private final RamblingProfessorEvent professsor;
+<span class="nc" id="L88">  private final Random rand = new Random();</span>
+<span class="nc" id="L89">  private final int maxVendingAmount = getRandom(2) + 3;</span>
+  // Change [03/01/2026] - Added achievement tracking system
+  private final AchievementManager achievementManager;
+  // Change [03/01/2026] - Added achievement notification display
+  private final AchievementNotification achievementNotification;
+  // Added in part 2
+  AudioManager audioManager;
+  boolean gameOver;
+<span class="nc" id="L97">  private boolean paused = true;</span>
+<span class="nc" id="L98">  private boolean showInstruction = true;</span>
+  private boolean hadCoinEvent;
+  private boolean hadFrogEvent;
+  private boolean hadPowerCutEvent;
+
+  /** The position of the player prior to processing input. */
+  private Vector2 prevPos;
+
+  private boolean hasMap;
+  private boolean showMap;
+<span class="nc" id="L108">  private boolean musicStopped = false;</span>
+<span class="nc" id="L109">  private float stateTime = 0;</span>
+<span class="nc" id="L110">  private int vendingMachineCount = 0;</span>
+<span class="nc" id="L111">  private float professorListeningTime =</span>
+      0f; // Track time spent listening to professor for Teacher's Pet achievement
+  // Change [17/12/2025] - Added UI for Pause and Instructions screens
+  private Stage uiStage;
+  private TextButton resumeButton;
+  private TextButton closeInstructionButton;
+  private Slider musicVolumeSlider;
+  private Label musicVolumeLabel;
+  private Slider volumeSlider;
+  private Label volumeLabel;
+  private TextButton returnButton;
+
+  /** Constructs a new WorldScreen, starting the player on the MainPath. */
+<span class="nc" id="L124">  public WorldScreen(Main game, String spritePath, String spriteImgPath) {</span>
+<span class="nc" id="L125">    this.game = game;</span>
+<span class="nc" id="L126">    this.items = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L127">    player = new Player(spritePath, spriteImgPath);</span>
+<span class="nc" id="L128">    worldMap = new WorldMap(&quot;MainPath1&quot;);</span>
+
+    // Load menu screen textures
+
+<span class="nc" id="L132">    pauseOverlay = new Texture(PAUSE_IMG);</span>
+<span class="nc" id="L133">    instructionOverlay = new Texture(INSTRUCTION_IMG);</span>
+<span class="nc" id="L134">    mapOverlay = new Texture(MAP_IMG);</span>
+<span class="nc" id="L135">    brickHorizontalTexture = new Texture(BRICK_HORIZONTAL_IMG);</span>
+<span class="nc" id="L136">    brickVerticalTexture = new Texture(BRICK_VERTICAL_IMG);</span>
+    // Construct game timer for 5mins
+<span class="nc" id="L138">    timer = new Timer(300f);</span>
+
+    // Constructs timer
+<span class="nc" id="L141">    score = new Score();</span>
+
+<span class="nc" id="L143">    audioManager = new AudioManager();</span>
+<span class="nc" id="L144">    audioManager.playMusic();</span>
+
+    // Change [01/01/2026] - Initialize achievement manager
+<span class="nc" id="L147">    achievementManager = new AchievementManager();</span>
+    // Change [03/01/2026] - Initialize achievement notification system
+<span class="nc" id="L149">    achievementNotification = new AchievementNotification();</span>
+
+    // Create a new power cut event
+<span class="nc" id="L152">    powerCutEvent = new PowerCut(POWERCUT_POSITION, 10f);</span>
+    // Create a new wind event
+<span class="nc" id="L154">    windEvent = new WindEvent();</span>
+    // Create Coffee Event
+<span class="nc" id="L156">    coffeeEvent =</span>
+        new SlipOnCoffee(
+            WorldMap.BOUNDARY_WIDTH * 2.5f,
+            Main.WORLD_HEIGHT - (float) WorldMap.ROOM_SIZE / 2,
+            2f,
+            2f); // x,y set in room
+    // Create duckStatue Event
+<span class="nc" id="L163">    duckStatue = new DuckStatue();</span>
+
+<span class="nc" id="L165">    professsor = new RamblingProfessorEvent(getRandom(45));</span>
+
+    // hiddenEventLabel setting
+<span class="nc" id="L168">    hiddenEventLabel = new Label(&quot;Hidden Event: 0&quot;, Main.labelStyle);</span>
+<span class="nc" id="L169">    hiddenEventLabel.setFontScale(0.03f);</span>
+<span class="nc" id="L170">    hiddenEventLabel.setPosition(0.5f, Main.WORLD_HEIGHT - 10);</span>
+    // negativeEventLabel setting
+<span class="nc" id="L172">    negativeEventLabel = new Label(&quot;Negative Event: 0&quot;, Main.labelStyle);</span>
+<span class="nc" id="L173">    negativeEventLabel.setFontScale(0.03f);</span>
+<span class="nc" id="L174">    negativeEventLabel.setPosition(0.5f, Main.WORLD_HEIGHT - 11);</span>
+    // positiveEventLabel setting
+<span class="nc" id="L176">    positiveEventLabel = new Label(&quot;Positive Event: 0&quot;, Main.labelStyle);</span>
+<span class="nc" id="L177">    positiveEventLabel.setFontScale(0.03f);</span>
+<span class="nc" id="L178">    positiveEventLabel.setPosition(0.5f, Main.WORLD_HEIGHT - 12);</span>
+
+<span class="nc" id="L180">    mapInstructionsLabel = new Label(&quot;Press E to view map&quot;, Main.labelStyle);</span>
+<span class="nc" id="L181">    mapInstructionsLabel.setFontScale(0.03f);</span>
+<span class="nc" id="L182">    mapInstructionsLabel.setPosition(WorldMap.BOUNDARY_WIDTH + 2, -5);</span>
+
+<span class="nc" id="L184">    frogLabel = new Label(&quot;KEEP PRESSING SPACE TO ESCAPE!!!&quot;, Main.labelStyle);</span>
+<span class="nc" id="L185">    frogLabel.setFontScale(0.04f);</span>
+<span class="nc" id="L186">    frogLabel.setPosition(8, Main.WORLD_HEIGHT - 15);</span>
+
+<span class="nc" id="L188">    professorLabel = new Label(&quot;&quot;, Main.labelStyle);</span>
+<span class="nc" id="L189">    professorLabel.setFontScale(0.02f);</span>
+<span class="nc" id="L190">    professorLabel.setPosition(Main.WORLD_WIDTH - WorldMap.BOUNDARY_WIDTH * 3, 16);</span>
+<span class="nc" id="L191">    professorLabel.setWrap(true);</span>
+<span class="nc" id="L192">    professorLabel.setWidth(6);</span>
+
+    // Set player position to centre of viewport
+<span class="nc" id="L195">    player.setPosition(</span>
+<span class="nc" id="L196">        game.getViewport().getWorldWidth() / 2f, game.getViewport().getWorldHeight() / 2f);</span>
+
+<span class="nc" id="L198">    initialiseui();</span>
+<span class="nc" id="L199">  }</span>
+
+  @Override
+  public void render(float delta) {
+<span class="nc" id="L203">    input(delta);</span>
+
+<span class="nc" id="L205">    logic(delta);</span>
+<span class="nc" id="L206">    draw();</span>
+    // Change [17/12/2025] - Update and draw UI Stage for buttons
+<span class="nc" id="L208">    updateuibuttons();</span>
+<span class="nc" id="L209">    uiStage.act(delta);</span>
+<span class="nc" id="L210">    uiStage.draw();</span>
+<span class="nc" id="L211">  }</span>
+
+  /** [17/12/2025] - Update button and slider visibility based on screen state. */
+  private void updateuibuttons() {
+<span class="nc bnc" id="L215" title="All 4 branches missed.">    gameOver = !timer.getIsRunning() &amp;&amp; timer.getTimeLeft() &lt;= 0;</span>
+
+    // stop when game ends
+<span class="nc bnc" id="L218" title="All 6 branches missed.">    if (gameOver &amp;&amp; !musicStopped &amp;&amp; audioManager.musicIsPlaying()) {</span>
+<span class="nc" id="L219">      audioManager.stopMusic();</span>
+<span class="nc" id="L220">      musicStopped = true;</span>
+    }
+
+<span class="nc bnc" id="L223" title="All 6 branches missed.">    resumeButton.setVisible(paused &amp;&amp; !showInstruction &amp;&amp; !gameOver);</span>
+<span class="nc bnc" id="L224" title="All 4 branches missed.">    closeInstructionButton.setVisible(showInstruction &amp;&amp; !gameOver);</span>
+<span class="nc bnc" id="L225" title="All 6 branches missed.">    musicVolumeSlider.setVisible(paused &amp;&amp; !showInstruction &amp;&amp; !gameOver);</span>
+<span class="nc bnc" id="L226" title="All 6 branches missed.">    musicVolumeLabel.setVisible(paused &amp;&amp; !showInstruction &amp;&amp; !gameOver);</span>
+<span class="nc bnc" id="L227" title="All 6 branches missed.">    volumeSlider.setVisible(paused &amp;&amp; !showInstruction &amp;&amp; !gameOver);</span>
+<span class="nc bnc" id="L228" title="All 6 branches missed.">    volumeLabel.setVisible(paused &amp;&amp; !showInstruction &amp;&amp; !gameOver);</span>
+<span class="nc bnc" id="L229" title="All 6 branches missed.">    returnButton.setVisible(!showInstruction &amp;&amp; (paused || gameOver));</span>
+<span class="nc" id="L230">  }</span>
+
+  /** Collision Logic. */
+  void collision(Rectangle playerBounds) {
+
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">    for (Obstacle obstacle : worldMap.getObstacles()) {</span>
+<span class="pc bpc" id="L236" title="2 of 4 branches missed.">      if (obstacle.getSolid() &amp;&amp; playerBounds.overlaps(obstacle.getBounds())) {</span>
+        // Move player back if they collide with an obstacle
+<span class="fc" id="L238">        player.setPosition(prevPos);</span>
+<span class="fc" id="L239">        return;</span>
+      }
+<span class="nc" id="L241">    }</span>
+<span class="nc" id="L242">  }</span>
+
+  /**
+   * Check if coffee event is triggered Refactored 21/11/25 for testability - moved out of
+   * collision().
+   *
+   * @param playerBounds rectangle representing player position
+   * @param delta time in seconds since last call
+   */
+  void checkCoffeeTrigger(Rectangle playerBounds, float delta) {
+
+<span class="fc" id="L253">    coffeeEvent.update(delta, player, worldMap.getCurrentLocation(), Main.coffeeSlipRoom);</span>
+
+<span class="fc bfc" id="L255" title="All 2 branches covered.">    if (coffeeEvent.inRoom) {</span>
+<span class="pc bpc" id="L256" title="2 of 4 branches missed.">      if (playerBounds.overlaps(coffeeEvent.getBounds()) &amp;&amp; !coffeeEvent.isActive()) {</span>
+<span class="fc" id="L257">        coffeeEvent.trigger(); // only triggers if every prerequisite is met</span>
+<span class="fc" id="L258">        audioManager.playCoffee();</span>
+      }
+    }
+<span class="fc" id="L261">  }</span>
+
+  /**
+   * Check if duck piece is found Refactored 29/11/25 for testability - moved out of collision().
+   *
+   * @param playerBounds rectangle representing player position
+   */
+  void checkDuckTrigger(Rectangle playerBounds, String currentRoom) {
+    // if in the same room as a duck piece  then collect
+<span class="nc bnc" id="L270" title="All 2 branches missed.">    for (DuckStatuePiece piece : duckStatue.getPieces()) {</span>
+<span class="nc bnc" id="L271" title="All 4 branches missed.">      if (piece.inRoom(currentRoom) &amp;&amp; playerBounds.overlaps(piece.getBounds())) {</span>
+<span class="nc bnc" id="L272" title="All 2 branches missed.">        if (!piece.isTriggered()) {</span>
+<span class="nc" id="L273">          piece.trigger();</span>
+          // 150 points for finding each piece of duck
+<span class="nc" id="L275">          score.addDuckBonus();</span>
+<span class="nc" id="L276">          audioManager.playCollectItem();</span>
+<span class="nc" id="L277">          checkDuckComplete();</span>
+        }
+<span class="nc bnc" id="L279" title="All 2 branches missed.">      } else if (currentRoom.equals(Main.securityLocation)</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">          &amp;&amp; piece.isStolen()</span>
+<span class="nc bnc" id="L281" title="All 2 branches missed.">          &amp;&amp; playerBounds.overlaps(piece.getBounds())</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">          &amp;&amp; security.isSleeping()) {</span>
+<span class="nc" id="L283">        piece.unsteal();</span>
+
+<span class="nc" id="L285">        audioManager.playCollectItem();</span>
+      }
+<span class="nc" id="L287">    }</span>
+<span class="nc" id="L288">  }</span>
+
+  /**
+   * Check if all duck pieces have been found created 21/12/2025 when separating duck into pieces.
+   */
+  void checkDuckComplete() {
+<span class="pc bpc" id="L294" title="1 of 2 branches missed.">    if (duckStatue.checkAllFound()) {</span>
+<span class="fc" id="L295">      score.addTimeRemainingBonus(timer.getTimeLeft());</span>
+<span class="pc bpc" id="L296" title="2 of 4 branches missed.">      if (!musicStopped &amp;&amp; audioManager.musicIsPlaying()) {</span>
+<span class="nc" id="L297">        audioManager.stopMusic();</span>
+<span class="nc" id="L298">        musicStopped = true;</span>
+      }
+<span class="fc bfc" id="L300" title="All 2 branches covered.">      if (300 - timer.getTimeLeft() &lt;= SPEED_RUNNER_TIME_LIMIT) {</span>
+<span class="fc" id="L301">        Achievement unlocked = achievementManager.unlockAchievement(&quot;speed_runner&quot;);</span>
+<span class="pc bpc" id="L302" title="1 of 2 branches missed.">        if (unlocked != null) {</span>
+<span class="fc" id="L303">          achievementNotification.show(unlocked);</span>
+        }
+      }
+
+<span class="fc" id="L307">      game.setScreen(new WinScreen(game, timer.getTimeLeft(), score.getCurrentScore()));</span>
+    }
+<span class="fc" id="L309">  }</span>
+
+  /**
+   * Check if vending machine is triggered Refactored 29/11/25 for testability - moved out of
+   * collision() Vending machine changed from stamina increase to speed increase followed by crash.
+   *
+   * @param playerBounds rectangle representing player position
+   */
+  void checkVendingMachineTrigger(Rectangle playerBounds) {
+<span class="pc bpc" id="L318" title="1 of 2 branches missed.">    if (worldMap.getCurrentLocation().equals(game.vendingMachineRoom)) {</span>
+<span class="fc" id="L319">      Collection&lt;Obstacle&gt; obstacles = worldMap.getObstacles();</span>
+<span class="fc" id="L320">      Obstacle vendingMachine =</span>
+          (Obstacle)
+<span class="fc" id="L322">              obstacles.stream()</span>
+<span class="fc" id="L323">                  .filter(obstacle -&gt; obstacle.getTextureInternalPath().equals(VENDING_IMG))</span>
+<span class="fc" id="L324">                  .toArray()[0];</span>
+
+<span class="fc" id="L326">      boolean canSpawn = true;</span>
+<span class="fc bfc" id="L327" title="All 2 branches covered.">      for (Item i : items) {</span>
+<span class="pc bpc" id="L328" title="1 of 2 branches missed.">        if (i.getTextureInternalPath().equals(DRINK_IMG)) {</span>
+<span class="fc" id="L329">          canSpawn = false;</span>
+        }
+<span class="fc" id="L331">      }</span>
+<span class="pc bpc" id="L332" title="1 of 4 branches missed.">      if (playerBounds.overlaps(vendingMachine.getBounds())</span>
+          &amp;&amp; canSpawn
+<span class="pc bpc" id="L334" title="1 of 2 branches missed.">          &amp;&amp; !playerBounds.overlaps(</span>
+              (new Rectangle(
+<span class="fc" id="L336">                  vendingMachine.getPosition().x, vendingMachine.getPosition().y - 5, 1, 1)))) {</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        if (vendingMachineCount == 0) {</span>
+<span class="fc" id="L338">          Event.incrementPositiveEventCounter();</span>
+        }
+<span class="fc bfc" id="L340" title="All 2 branches covered.">        if (vendingMachineCount &lt; maxVendingAmount) {</span>
+<span class="fc" id="L341">          Item item =</span>
+              new Item(
+<span class="fc" id="L343">                  vendingMachine.getPosition().x,</span>
+<span class="fc" id="L344">                  vendingMachine.getPosition().y - 5,</span>
+                  1,
+                  1,
+                  DRINK_IMG,
+                  ItemType.CONSUMABLE,
+                  () -&gt; {
+<span class="fc" id="L350">                    player.setSpeed(player.getSpeed() + 3f);</span>
+<span class="fc" id="L351">                    audioManager.playDrinking();</span>
+<span class="fc" id="L352">                  });</span>
+<span class="fc" id="L353">          items.add(item);</span>
+<span class="fc" id="L354">        } else {</span>
+<span class="fc" id="L355">          Item item =</span>
+              new Item(
+<span class="fc" id="L357">                  vendingMachine.getPosition().x,</span>
+<span class="fc" id="L358">                  vendingMachine.getPosition().y - 5,</span>
+                  1,
+                  1,
+                  DRINK_IMG,
+                  ItemType.CONSUMABLE,
+                  () -&gt; {
+<span class="fc" id="L364">                    player.sugarCrash();</span>
+<span class="fc" id="L365">                    Event.incrementNegativeEventCounter();</span>
+<span class="fc" id="L366">                    audioManager.playDrinking();</span>
+                    // Change [03/01/2026] - Unlock Sugar Crash achievement when drinking too many
+                    // energy drinks
+<span class="fc" id="L369">                    Achievement unlocked = achievementManager.unlockAchievement(&quot;sugar_crash&quot;);</span>
+<span class="pc bpc" id="L370" title="1 of 2 branches missed.">                    if (unlocked != null) {</span>
+<span class="fc" id="L371">                      achievementNotification.show(unlocked);</span>
+                    }
+<span class="fc" id="L373">                  });</span>
+<span class="fc" id="L374">          items.add(item);</span>
+        }
+<span class="fc" id="L376">        vendingMachineCount++;</span>
+<span class="fc" id="L377">        vendingMachine.trigger();</span>
+      }
+    }
+<span class="fc" id="L380">  }</span>
+
+  /**
+   * Check if power cut is triggered Refactored 01/12/25 for testability - moved out of collision().
+   *
+   * @param delta seconds since last call
+   */
+  void checkPowerCutTrigger(float delta) {
+    // Checks if player is in Piazza for PowerCut hidden event
+<span class="pc bpc" id="L389" title="1 of 2 branches missed.">    if (worldMap.getCurrentLocation().equals(PIAZZA_ROOM)) {</span>
+      // Changed 10/12/25 from trigger zone to random trigger
+<span class="pc bpc" id="L391" title="2 of 4 branches missed.">      if (!powerCutEvent.isTriggered() &amp;&amp; getRandom(600) == 0) {</span>
+<span class="fc" id="L392">        powerCutEvent.trigger();</span>
+<span class="fc" id="L393">        audioManager.playPowerCut();</span>
+
+<span class="pc bpc" id="L395" title="1 of 2 branches missed.">        if (!hadPowerCutEvent) {</span>
+<span class="fc" id="L396">          hadPowerCutEvent = true;</span>
+<span class="fc" id="L397">          Event.incrementNegativeEventCounter();</span>
+        }
+      }
+    }
+<span class="fc" id="L401">  }</span>
+
+  void checkProfessorTrigger(Rectangle playerBounds, float delta) {
+    // Check if player is in professor room
+<span class="fc" id="L405">    String currentLocation = worldMap.getCurrentLocation();</span>
+<span class="fc" id="L406">    boolean inProfessorRoom = currentLocation.equals(Main.professorRoom);</span>
+<span class="fc" id="L407">    Rectangle professorBounds = professsor.getBounds();</span>
+<span class="fc" id="L408">    boolean overlappingProfessor = playerBounds.overlaps(professorBounds);</span>
+
+    // Change [03/01/2026] - Trigger professor if player overlaps (only needed for initial trigger)
+<span class="pc bpc" id="L411" title="2 of 4 branches missed.">    if (inProfessorRoom &amp;&amp; overlappingProfessor) {</span>
+      // Trigger professor if not already triggered
+<span class="pc bpc" id="L413" title="1 of 2 branches missed.">      if (!professsor.isTriggered()) {</span>
+<span class="nc" id="L414">        professsor.trigger(); // only triggers if every prerequisite is met</span>
+        // Reset listening time when starting
+<span class="nc" id="L416">        professorListeningTime = 0f;</span>
+      }
+    }
+
+    // Change [03/01/2026] - Once professor dialogue is triggered, continue tracking time as long as
+    // player is in room
+    // No overlap required after initial trigger - allows player to move freely while listening
+<span class="pc bpc" id="L423" title="2 of 4 branches missed.">    if (inProfessorRoom &amp;&amp; professsor.isTriggered()) {</span>
+<span class="pc bpc" id="L424" title="1 of 2 branches missed.">      if (professorLabel != null) {</span>
+<span class="fc" id="L425">        professorLabel.setText(professsor.talk(delta));</span>
+      }
+
+      // Change [03/01/2026] - Track professor listening time for Teacher's Pet achievement
+      // Time accumulates as long as player is in professor room after dialogue is triggered
+<span class="fc" id="L430">      boolean alreadyUnlocked = achievementManager.isUnlocked(&quot;teachers_pet&quot;);</span>
+<span class="fc bfc" id="L431" title="All 2 branches covered.">      if (!alreadyUnlocked) {</span>
+<span class="fc" id="L432">        professorListeningTime += delta;</span>
+
+<span class="fc bfc" id="L434" title="All 2 branches covered.">        if (professorListeningTime &gt;= TEACHERS_PET_TIME_REQUIRED) {</span>
+<span class="fc" id="L435">          Achievement unlocked = achievementManager.unlockAchievement(&quot;teachers_pet&quot;);</span>
+<span class="pc bpc" id="L436" title="1 of 2 branches missed.">          if (unlocked != null) {</span>
+<span class="fc" id="L437">            achievementNotification.show(unlocked);</span>
+          }
+        }
+      }
+<span class="pc bnc" id="L441" title="All 2 branches missed.">    } else if (!inProfessorRoom) {</span>
+      // Reset listening time when player moves away (as per user requirement)
+<span class="nc bnc" id="L443" title="All 4 branches missed.">      if (professorListeningTime &gt; 0f &amp;&amp; !achievementManager.isUnlocked(&quot;teachers_pet&quot;)) {</span>
+<span class="nc" id="L444">        professorListeningTime = 0f;</span>
+      }
+    }
+    // Note: Time is reset when leaving room in onRoomChanged() method
+
+<span class="fc" id="L449">  }</span>
+
+  void checkSecurityTrigger(Rectangle playerBounds, float delta) {
+<span class="nc" id="L452">    ArrayList&lt;DuckStatuePiece&gt; foundPieces = duckStatue.getFoundPieces();</span>
+<span class="nc bnc" id="L453" title="All 2 branches missed.">    if (worldMap.getCurrentLocation().equals(Main.securityLocation)</span>
+<span class="nc bnc" id="L454" title="All 2 branches missed.">        &amp;&amp; !foundPieces.isEmpty()</span>
+<span class="nc bnc" id="L455" title="All 2 branches missed.">        &amp;&amp; playerBounds.overlaps(security.getBounds())</span>
+<span class="nc bnc" id="L456" title="All 2 branches missed.">        &amp;&amp; !security.isSleeping()</span>
+<span class="nc bnc" id="L457" title="All 2 branches missed.">        &amp;&amp; !security.hasDuck()) {</span>
+<span class="nc bnc" id="L458" title="All 2 branches missed.">      for (DuckStatuePiece piece : foundPieces) {</span>
+<span class="nc" id="L459">        piece.steal();</span>
+<span class="nc" id="L460">      }</span>
+<span class="nc" id="L461">      audioManager.playSwipe();</span>
+<span class="nc" id="L462">      security.setHasDuck(true);</span>
+<span class="nc" id="L463">      Event.incrementNegativeEventCounter();</span>
+    }
+<span class="nc" id="L465">  }</span>
+
+  int getRandom(int probability) {
+<span class="fc" id="L468">    return rand.nextInt(probability);</span>
+  }
+
+  /**
+   * Check if any item triggered Refactored 01/12/25 for testability - moved out of collision().
+   *
+   * @param playerBounds rectangle representing player position
+   */
+  void checkItemTrigger(Rectangle playerBounds) {
+
+<span class="fc" id="L478">    ArrayList&lt;Item&gt; itemsToRemove = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L479">    items.forEach(</span>
+        item -&gt; {
+<span class="pc bpc" id="L481" title="1 of 2 branches missed.">          if (item.getBounds().overlaps(playerBounds)) {</span>
+<span class="fc" id="L482">            item.trigger();</span>
+<span class="fc" id="L483">            itemsToRemove.add(item);</span>
+          }
+<span class="fc" id="L485">        });</span>
+<span class="fc" id="L486">    itemsToRemove.forEach(items::remove);</span>
+<span class="fc" id="L487">  }</span>
+
+  /**
+   * Check if a coin is collected and update score.
+   *
+   * @param playerBounds rectangle bounding player
+   */
+  void checkCoinTrigger(Rectangle playerBounds) {
+<span class="nc" id="L495">    String location = worldMap.getCurrentLocation();</span>
+<span class="nc bnc" id="L496" title="All 2 branches missed.">    if (worldMap.coins.containsKey(location)) {</span>
+<span class="nc bnc" id="L497" title="All 2 branches missed.">      if (playerBounds.overlaps(</span>
+<span class="nc" id="L498">          new Rectangle(worldMap.coins.get(location).x, worldMap.coins.get(location).y, 1, 1))) {</span>
+<span class="nc" id="L499">        score.addPoints(10);</span>
+<span class="nc" id="L500">        worldMap.coins.remove(location);</span>
+<span class="nc" id="L501">        worldMap.removeCoinFromObstacles();</span>
+<span class="nc" id="L502">        audioManager.playCollectItem();</span>
+
+<span class="nc bnc" id="L504" title="All 2 branches missed.">        if (!hadCoinEvent) {</span>
+<span class="nc" id="L505">          Event.incrementPositiveEventCounter();</span>
+<span class="nc" id="L506">          hadCoinEvent = true;</span>
+        }
+      }
+    }
+<span class="nc" id="L510">  }</span>
+
+  void checkFrogTrigger(Rectangle playerBounds, float delta) {
+
+<span class="nc bnc" id="L514" title="All 2 branches missed.">    if (worldMap.getCurrentLocation().equals(Main.frogLocation)) {</span>
+<span class="nc bnc" id="L515" title="All 4 branches missed.">      if (playerBounds.overlaps(frog.getBounds()) &amp;&amp; !frog.hasPlayer()) {</span>
+<span class="nc" id="L516">        frog.eat();</span>
+<span class="nc" id="L517">        audioManager.playGulp();</span>
+<span class="nc bnc" id="L518" title="All 2 branches missed.">        if (!hadFrogEvent) {</span>
+<span class="nc" id="L519">          Event.incrementNegativeEventCounter();</span>
+<span class="nc" id="L520">          hadFrogEvent = true;</span>
+        }
+      }
+
+<span class="nc bnc" id="L524" title="All 4 branches missed.">      if (!frog.hasPlayer() &amp;&amp; getRandom(100) == 1) {</span>
+<span class="nc" id="L525">        audioManager.playFrogSound();</span>
+      }
+    }
+
+<span class="nc bnc" id="L529" title="All 4 branches missed.">    if (frog.hasPlayer() &amp;&amp; frog.getEscapeCounter() &gt; 10) {</span>
+<span class="nc" id="L530">      frog.escape(player, delta);</span>
+    }
+
+<span class="nc" id="L533">    frog.update(delta);</span>
+<span class="nc" id="L534">  }</span>
+
+  /**
+   * Logic to run every tick.
+   *
+   * @param delta The time since the last tick
+   */
+  private void logic(float delta) {
+    // Change [03/01/2026] - Update achievement notification fade animation
+<span class="nc" id="L543">    achievementNotification.update(delta);</span>
+
+    // if paused, pause
+<span class="nc bnc" id="L546" title="All 2 branches missed.">    if (paused) {</span>
+<span class="nc" id="L547">      return;</span>
+    }
+
+    // Tick objects
+<span class="nc" id="L551">    timer.tick();</span>
+<span class="nc" id="L552">    player.energy.tick(delta);</span>
+<span class="nc" id="L553">    player.updatePlayer(stateTime);</span>
+
+<span class="nc" id="L555">    powerCutEvent.update(delta); // time left for powerCut event</span>
+<span class="nc" id="L556">    windEvent.updateLeaves(getRandom(50), getRandom(Main.WORLD_HEIGHT), delta);</span>
+<span class="nc" id="L557">    security.update(delta);</span>
+<span class="nc" id="L558">    Rectangle playerBounds = player.getSprite().getBoundingRectangle();</span>
+    // Check if player should change room
+<span class="nc" id="L560">    checkTransitions(playerBounds);</span>
+    // places coffee when in RCH
+<span class="nc bnc" id="L562" title="All 2 branches missed.">    if (worldMap.getCurrentLocation().equals(Main.coffeeSlipRoom)) {</span>
+<span class="nc bnc" id="L563" title="All 2 branches missed.">      if (!coffeeEvent.inRoom) {</span>
+<span class="nc" id="L564">        coffeeEvent.moveToRoom(worldMap);</span>
+      }
+    } else {
+<span class="nc" id="L567">      coffeeEvent.reset();</span>
+<span class="nc" id="L568">      coffeeEvent.leaveRoom();</span>
+    }
+
+<span class="nc" id="L571">    checkCoffeeTrigger(playerBounds, delta);</span>
+<span class="nc" id="L572">    checkDuckTrigger(playerBounds, worldMap.getCurrentLocation());</span>
+<span class="nc" id="L573">    checkVendingMachineTrigger(playerBounds);</span>
+<span class="nc" id="L574">    collision(playerBounds);</span>
+<span class="nc" id="L575">    checkPowerCutTrigger(delta);</span>
+<span class="nc" id="L576">    checkItemTrigger(playerBounds);</span>
+    // Change [01/01/2026] - Check professor trigger
+<span class="nc" id="L578">    checkProfessorTrigger(playerBounds, delta);</span>
+<span class="nc" id="L579">    checkCoinTrigger(playerBounds);</span>
+<span class="nc" id="L580">    checkSecurityTrigger(playerBounds, delta);</span>
+<span class="nc" id="L581">    checkFrogTrigger(playerBounds, delta);</span>
+<span class="nc" id="L582">    stateTime += delta;</span>
+<span class="nc" id="L583">  }</span>
+
+  /** Handle current inputs. */
+  private void input(float delta) {
+<span class="nc bnc" id="L587" title="All 2 branches missed.">    if (!gameOver) {</span>
+<span class="nc" id="L588">      prevPos = player.getPosition().cpy();</span>
+      // Toggle pause
+<span class="nc bnc" id="L590" title="All 2 branches missed.">      if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)</span>
+<span class="nc bnc" id="L591" title="All 2 branches missed.">          || Gdx.input.isKeyJustPressed(Input.Keys.P)) {</span>
+<span class="nc bnc" id="L592" title="All 2 branches missed.">        paused = !paused;</span>
+<span class="nc bnc" id="L593" title="All 2 branches missed.">        if (paused) {</span>
+<span class="nc" id="L594">          audioManager.stopWind();</span>
+<span class="nc bnc" id="L595" title="All 2 branches missed.">        } else if (windEvent.isActive()) {</span>
+<span class="nc" id="L596">          audioManager.playWind();</span>
+        }
+      }
+
+      // Handle volume controls
+      // Adjusted 24/1/25 after creation of AudioManager class
+<span class="nc bnc" id="L602" title="All 2 branches missed.">      if (Gdx.input.isKeyJustPressed(Input.Keys.M)) {</span>
+<span class="nc" id="L603">        audioManager.toggleMute();</span>
+<span class="nc" id="L604">        musicVolumeSlider.setValue(audioManager.getMusicVolume());</span>
+<span class="nc" id="L605">        volumeSlider.setValue(audioManager.getVolume());</span>
+      }
+
+      // Toggle instructions Screen
+<span class="nc bnc" id="L609" title="All 2 branches missed.">      if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {</span>
+<span class="nc bnc" id="L610" title="All 2 branches missed.">        showInstruction = !showInstruction;</span>
+<span class="nc" id="L611">        paused = showInstruction;</span>
+
+<span class="nc bnc" id="L613" title="All 2 branches missed.">        if (paused) {</span>
+<span class="nc" id="L614">          audioManager.stopWind();</span>
+<span class="nc bnc" id="L615" title="All 2 branches missed.">        } else if (windEvent.isActive()) {</span>
+<span class="nc" id="L616">          audioManager.playWind();</span>
+        }
+      }
+
+<span class="nc bnc" id="L620" title="All 4 branches missed.">      if (Gdx.input.isKeyJustPressed(Input.Keys.E) &amp;&amp; hasMap) {</span>
+<span class="nc bnc" id="L621" title="All 2 branches missed.">        showMap = !showMap;</span>
+      }
+
+<span class="nc" id="L624">      boolean slipping = coffeeEvent.isActive();</span>
+      // When game is not paused or instructionScreen not shown and player is not slipping, handle
+      // player input
+<span class="nc bnc" id="L627" title="All 8 branches missed.">      if (!paused &amp;&amp; !showInstruction &amp;&amp; !slipping &amp;&amp; !frog.hasPlayer()) {</span>
+        // Handle player input
+<span class="nc" id="L629">        player.handleInput(</span>
+<span class="nc bnc" id="L630" title="All 2 branches missed.">            worldMap.getCurrentLocation().contains(&quot;MainPath&quot;) ? windEvent.getWindy() : 0,</span>
+            delta,
+<span class="nc" id="L632">            (float) (getRandom(30) - 15) / 100,</span>
+<span class="nc" id="L633">            (float) (getRandom(30) - 15) / 100);</span>
+      }
+
+<span class="nc bnc" id="L636" title="All 4 branches missed.">      if (frog.hasPlayer() &amp;&amp; Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {</span>
+<span class="nc" id="L637">        frog.incrementEscapeCounter();</span>
+<span class="nc" id="L638">        frog.punch();</span>
+      }
+    }
+<span class="nc" id="L641">  }</span>
+
+  /** Draw the next frame . */
+  private void draw() {
+    // Clear the screen
+<span class="nc" id="L646">    Gdx.gl.glClearColor(0.25f, 0.25f, 0.25f, 1);</span>
+<span class="nc" id="L647">    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);</span>
+
+    // Start drawing
+<span class="nc" id="L650">    game.getViewport().apply();</span>
+<span class="nc" id="L651">    game.getBatch().setProjectionMatrix(game.getViewport().getCamera().combined);</span>
+<span class="nc" id="L652">    SpriteBatch batch = game.getBatch();</span>
+<span class="nc" id="L653">    batch.begin();</span>
+
+    // Render sprites
+<span class="nc" id="L656">    worldMap.render(batch);</span>
+<span class="nc bnc" id="L657" title="All 2 branches missed.">    for (String wall : WorldMap.currentBricks.keySet()) {</span>
+<span class="nc bnc" id="L658" title="All 2 branches missed.">      if (WorldMap.currentBricks.get(wall) != null) {</span>
+<span class="nc" id="L659">        Rectangle wallPos = WorldMap.currentBricks.get(wall);</span>
+<span class="nc bnc" id="L660" title="All 4 branches missed.">        if (wall.equals(&quot;up&quot;) || wall.equals(&quot;down&quot;)) {</span>
+<span class="nc" id="L661">          batch.draw(brickHorizontalTexture, wallPos.x, wallPos.y, wallPos.width, wallPos.height);</span>
+        } else {
+<span class="nc" id="L663">          batch.draw(brickVerticalTexture, wallPos.x, wallPos.y, wallPos.width, wallPos.height);</span>
+        }
+      }
+<span class="nc" id="L666">    }</span>
+<span class="nc" id="L667">    security.render(batch, worldMap.getCurrentLocation());</span>
+
+<span class="nc bnc" id="L669" title="All 4 branches missed.">    if (!frog.hasPlayer() || frog.isEscaping()) {</span>
+<span class="nc" id="L670">      player.render(batch);</span>
+    }
+<span class="nc" id="L672">    frog.render(batch, getWorldMap().getCurrentLocation());</span>
+<span class="nc" id="L673">    worldMap.getObstacles().forEach(obstacle -&gt; obstacle.render(batch));</span>
+<span class="nc" id="L674">    items.forEach(item -&gt; item.render(batch));</span>
+
+    // only render coffee in RCH
+<span class="nc bnc" id="L677" title="All 2 branches missed.">    if (worldMap.getCurrentLocation().equals(Main.coffeeSlipRoom)) {</span>
+<span class="nc" id="L678">      coffeeEvent.render(batch);</span>
+    }
+
+<span class="nc" id="L681">    duckStatue.render(batch, worldMap.getCurrentLocation(), security.isSleeping());</span>
+<span class="nc" id="L682">    professsor.render(batch, worldMap.getCurrentLocation());</span>
+<span class="nc" id="L683">    windEvent.render(batch, worldMap.getCurrentLocation());</span>
+<span class="nc" id="L684">    game.getBatch().setColor(Color.WHITE);</span>
+
+<span class="nc bnc" id="L686" title="All 2 branches missed.">    if (powerCutEvent != null</span>
+<span class="nc bnc" id="L687" title="All 2 branches missed.">        &amp;&amp; powerCutEvent.isTriggered()</span>
+<span class="nc bnc" id="L688" title="All 2 branches missed.">        &amp;&amp; worldMap.getCurrentLocation().equals(PIAZZA_ROOM)) {</span>
+<span class="nc" id="L689">      float darkness = powerCutEvent.getDarknessLevel();</span>
+<span class="nc bnc" id="L690" title="All 2 branches missed.">      if (darkness &gt; 0f) {</span>
+
+        // Changed 10/12/25 to only make the tile black (not the whole screen)  and to add eyes to
+        // locate the player
+<span class="nc" id="L694">        Texture roomTexture = new Texture(&quot;rooms/&quot; + PIAZZA_ROOM + &quot;.png&quot;);</span>
+<span class="nc" id="L695">        Sprite black = new Sprite(roomTexture);</span>
+        // Resize and position
+<span class="nc" id="L697">        black.setSize(WorldMap.ROOM_SIZE, WorldMap.ROOM_SIZE);</span>
+<span class="nc" id="L698">        Rectangle rect =</span>
+            black
+<span class="nc" id="L700">                .getBoundingRectangle()</span>
+<span class="nc" id="L701">                .setCenter(new Vector2(Main.WORLD_WIDTH / 2f, Main.WORLD_HEIGHT / 2f));</span>
+<span class="nc" id="L702">        black.setPosition(rect.x, rect.y);</span>
+<span class="nc" id="L703">        black.setColor(Color.BLACK);</span>
+<span class="nc" id="L704">        black.draw(batch);</span>
+
+<span class="nc" id="L706">        batch.draw(</span>
+<span class="nc" id="L707">            new Texture(Gdx.files.internal(&quot;items/eyes.png&quot;)),</span>
+<span class="nc" id="L708">            player.getSprite().getX(),</span>
+<span class="nc" id="L709">            (float) (player.getSprite().getY() + (player.getSprite().getHeight() * 0.5)),</span>
+            1f,
+            0.75f);
+      }
+    }
+
+<span class="nc" id="L715">    Label title = new Label(&quot;Events: &quot;, Main.labelStyle);</span>
+<span class="nc" id="L716">    title.setFontScale(0.03f);</span>
+<span class="nc" id="L717">    title.setPosition(0.5f, Main.WORLD_HEIGHT - 8);</span>
+<span class="nc" id="L718">    title.draw(batch, 1f);</span>
+
+<span class="nc" id="L720">    hiddenEventLabel.setText(&quot;Hidden: &quot; + HiddenEvent.getCounter());</span>
+<span class="nc" id="L721">    hiddenEventLabel.draw(batch, 1f);</span>
+<span class="nc" id="L722">    negativeEventLabel.setText(&quot;Negative: &quot; + Event.getNegativeEventCounter());</span>
+<span class="nc" id="L723">    negativeEventLabel.draw(batch, 1f);</span>
+<span class="nc" id="L724">    positiveEventLabel.setText(&quot;Positive: &quot; + Event.getPositiveEventCounter());</span>
+<span class="nc" id="L725">    positiveEventLabel.draw(batch, 1f);</span>
+<span class="nc" id="L726">    player.energy.render(batch);</span>
+<span class="nc" id="L727">    timer.render(batch);</span>
+<span class="nc" id="L728">    score.render(batch);</span>
+<span class="nc bnc" id="L729" title="All 4 branches missed.">    if (hasMap &amp;&amp; !gameOver) {</span>
+<span class="nc" id="L730">      mapInstructionsLabel.draw(batch, 1f);</span>
+    }
+
+<span class="nc bnc" id="L733" title="All 2 branches missed.">    if (frog.hasPlayer()) {</span>
+<span class="nc" id="L734">      frogLabel.draw(batch, 1f);</span>
+    }
+    // overlays screens
+
+<span class="nc bnc" id="L738" title="All 4 branches missed.">    if (worldMap.getCurrentLocation().equals(Main.professorRoom) &amp;&amp; professsor.isTriggered()) {</span>
+<span class="nc" id="L739">      professorLabel.setPosition(20, 20);</span>
+<span class="nc" id="L740">      professorLabel.draw(batch, 1f);</span>
+    }
+
+    // overlays screens (drawn last to be on top)
+<span class="nc bnc" id="L744" title="All 2 branches missed.">    if (showInstruction) {</span>
+<span class="nc" id="L745">      batch.draw(</span>
+          instructionOverlay,
+          0,
+          0,
+<span class="nc" id="L749">          game.getViewport().getWorldWidth(),</span>
+<span class="nc" id="L750">          game.getViewport().getWorldHeight());</span>
+<span class="nc bnc" id="L751" title="All 2 branches missed.">    } else if (paused) {</span>
+<span class="nc" id="L752">      batch.draw(</span>
+          pauseOverlay,
+          0,
+          0,
+<span class="nc" id="L756">          game.getViewport().getWorldWidth(),</span>
+<span class="nc" id="L757">          game.getViewport().getWorldHeight());</span>
+<span class="nc bnc" id="L758" title="All 2 branches missed.">    } else if (showMap) {</span>
+<span class="nc" id="L759">      batch.draw(</span>
+          mapOverlay,
+          (float) (Main.WORLD_WIDTH - WorldMap.ROOM_SIZE + 1) / 2,
+          (float) (Main.WORLD_HEIGHT - WorldMap.ROOM_SIZE + 6) / 2,
+<span class="nc" id="L763">          game.getViewport().getWorldWidth() - 16,</span>
+<span class="nc" id="L764">          game.getViewport().getWorldHeight() - 6);</span>
+    }
+
+    // Change [03/01/2026] - Render achievement notification LAST in the main batch to ensure it's
+    // on top
+    // Only show if not paused and not showing instruction/map overlays
+<span class="nc bnc" id="L770" title="All 8 branches missed.">    if (achievementNotification.isActive() &amp;&amp; !showInstruction &amp;&amp; !paused &amp;&amp; !showMap) {</span>
+<span class="nc" id="L771">      achievementNotification.render(batch);</span>
+    }
+
+<span class="nc" id="L774">    batch.end();</span>
+<span class="nc" id="L775">  }</span>
+
+  /**
+   * Check whether the player should transition to a new room. Track position of player so slipping
+   * doesn't create bugs.
+   */
+  void checkTransitions(Rectangle playerBounds) {
+<span class="fc" id="L782">    boolean moved = false;</span>
+<span class="fc" id="L783">    Vector2 bottomLeftPlayer = player.getPosition();</span>
+<span class="fc" id="L784">    Vector2 topRightPlayer =</span>
+        new Vector2(
+            bottomLeftPlayer.x + playerBounds.width, bottomLeftPlayer.y + playerBounds.height);
+<span class="fc" id="L787">    Vector2 playerSize = new Vector2(playerBounds.width, playerBounds.height);</span>
+
+<span class="fc" id="L789">    Vector2 pos = player.getPosition();</span>
+<span class="fc" id="L790">    Vector2 bottomLeftRoom = worldMap.getPosition();</span>
+<span class="fc" id="L791">    Vector2 topRightRoom =</span>
+        new Vector2(bottomLeftRoom.x + WorldMap.ROOM_SIZE, bottomLeftRoom.y + WorldMap.ROOM_SIZE);
+    // Left
+<span class="fc bfc" id="L794" title="All 2 branches covered.">    if (pos.x &lt; bottomLeftRoom.x) {</span>
+<span class="pc bpc" id="L795" title="1 of 2 branches missed.">      if (worldMap.move(OrthogonalDirection.left)) {</span>
+<span class="fc" id="L796">        Vector2 newtlr =</span>
+            new Vector2(
+<span class="fc" id="L798">                worldMap.getPosition().x + WorldMap.ROOM_SIZE,</span>
+<span class="fc" id="L799">                worldMap.getPosition().y + WorldMap.ROOM_SIZE);</span>
+<span class="fc" id="L800">        player.setPosition(newtlr.x - playerSize.x - 0.5f, pos.y);</span>
+<span class="fc" id="L801">        onRoomChanged();</span>
+<span class="fc" id="L802">        moved = true;</span>
+<span class="fc" id="L803">      }</span>
+
+      // Right
+<span class="fc bfc" id="L806" title="All 2 branches covered.">    } else if (pos.x + playerSize.x &gt; topRightRoom.x) {</span>
+<span class="fc bfc" id="L807" title="All 2 branches covered.">      if (worldMap.move(OrthogonalDirection.right)) {</span>
+<span class="fc" id="L808">        player.setPosition(worldMap.getPosition().x + 0.5f, pos.y);</span>
+<span class="fc" id="L809">        onRoomChanged();</span>
+<span class="fc" id="L810">        moved = true;</span>
+      }
+    }
+
+    // Down
+<span class="pc bpc" id="L815" title="1 of 4 branches missed.">    if (pos.y &lt; bottomLeftRoom.y &amp;&amp; !moved) {</span>
+<span class="pc bpc" id="L816" title="1 of 2 branches missed.">      if (worldMap.move(OrthogonalDirection.down)) {</span>
+<span class="fc" id="L817">        player.setPosition(</span>
+<span class="fc" id="L818">            pos.x, worldMap.getPosition().y + WorldMap.ROOM_SIZE - playerSize.y - 0.5f);</span>
+<span class="fc" id="L819">        onRoomChanged();</span>
+<span class="fc" id="L820">        moved = true;</span>
+      }
+
+      // Up
+<span class="pc bpc" id="L824" title="1 of 4 branches missed.">    } else if (pos.y + playerSize.y &gt; topRightRoom.y &amp;&amp; !moved) {</span>
+<span class="pc bpc" id="L825" title="1 of 2 branches missed.">      if (worldMap.move(OrthogonalDirection.up)) {</span>
+<span class="fc" id="L826">        player.setPosition(pos.x, worldMap.getPosition().y + 0.5f);</span>
+<span class="fc" id="L827">        onRoomChanged();</span>
+<span class="fc" id="L828">        moved = true;</span>
+      }
+    }
+
+<span class="fc bfc" id="L832" title="All 2 branches covered.">    if (moved) {</span>
+<span class="fc" id="L833">      items.forEach(Item::dispose);</span>
+<span class="fc" id="L834">      items.clear();</span>
+<span class="fc bfc" id="L835" title="All 2 branches covered.">      if (player.getPosition().y &lt;= bottomLeftRoom.y) {</span>
+<span class="fc" id="L836">        player.setPosition(player.getPosition().x, bottomLeftRoom.y + 1);</span>
+      }
+<span class="fc bfc" id="L838" title="All 2 branches covered.">      if (player.getPosition().y + playerSize.y &gt;= topRightRoom.y) {</span>
+<span class="fc" id="L839">        player.setPosition(player.getPosition().x, topRightRoom.y - 1 - playerSize.y);</span>
+      }
+<span class="fc bfc" id="L841" title="All 2 branches covered.">      if (player.getPosition().x &lt;= bottomLeftRoom.x) {</span>
+<span class="fc" id="L842">        player.setPosition(bottomLeftRoom.x + 1, player.getPosition().y);</span>
+      }
+<span class="fc bfc" id="L844" title="All 2 branches covered.">      if (player.getPosition().x + playerSize.x &gt;= topRightRoom.x) {</span>
+<span class="fc" id="L845">        player.setPosition(topRightRoom.x - 1 - playerSize.x, player.getPosition().y);</span>
+      }
+<span class="fc" id="L847">      prevPos = player.getPosition().cpy();</span>
+
+      // Draw map if in correct room
+<span class="pc bpc" id="L850" title="3 of 4 branches missed.">      if (worldMap.getCurrentLocation().equals(Main.mapRoom) &amp;&amp; !hasMap) {</span>
+
+<span class="nc" id="L852">        items.add(</span>
+            new Item(
+                20,
+                10,
+                4,
+                4,
+                MAP_IMG,
+                ItemType.CONSUMABLE,
+                () -&gt; {
+<span class="nc" id="L861">                  hasMap = true;</span>
+<span class="nc" id="L862">                  Event.incrementPositiveEventCounter();</span>
+<span class="nc" id="L863">                }));</span>
+      }
+    }
+<span class="fc" id="L866">  }</span>
+
+  /** Resets coffee event when leaving rooms. */
+  private void onRoomChanged() {
+<span class="fc" id="L870">    coffeeEvent.reset();</span>
+<span class="fc" id="L871">    coffeeEvent.inRoom = false;</span>
+<span class="fc" id="L872">    windEvent.checkWindTrigger(</span>
+<span class="fc" id="L873">        getRandom(4),</span>
+<span class="fc" id="L874">        getRandom(3) - 1,</span>
+<span class="fc" id="L875">        worldMap.getCurrentLocation(),</span>
+<span class="fc" id="L876">        worldMap.getPreviousLocation(),</span>
+        audioManager);
+<span class="fc" id="L878">    security.onRoomChange(getWorldMap().getCurrentLocation());</span>
+
+    // Change [03/01/2026] - Reset professor listening time when leaving professor room
+    // This ensures the timer resets if player leaves before completing 15 seconds
+<span class="fc" id="L882">    String previousLocation = worldMap.getPreviousLocation();</span>
+<span class="pc bpc" id="L883" title="1 of 2 branches missed.">    if (previousLocation != null</span>
+<span class="pc bpc" id="L884" title="1 of 2 branches missed.">        &amp;&amp; previousLocation.equals(Main.professorRoom)</span>
+<span class="nc bnc" id="L885" title="All 2 branches missed.">        &amp;&amp; !worldMap.getCurrentLocation().equals(Main.professorRoom)) {</span>
+      // Player left professor room, reset listening time
+<span class="nc bnc" id="L887" title="All 4 branches missed.">      if (professorListeningTime &gt; 0f &amp;&amp; !achievementManager.isUnlocked(&quot;teachers_pet&quot;)) {</span>
+<span class="nc" id="L888">        Gdx.app.log(</span>
+            &quot;Achievement&quot;,
+            &quot;Player left professor room (&quot;
+                + previousLocation
+                + &quot; -&gt; &quot;
+<span class="nc" id="L893">                + worldMap.getCurrentLocation()</span>
+                + &quot;), resetting listening time from &quot;
+                + professorListeningTime
+                + &quot;s&quot;);
+<span class="nc" id="L897">        professorListeningTime = 0f;</span>
+      }
+    }
+
+    // Change [03/01/2026] - Check Totally Lost achievement when player reaches carpark
+<span class="fc bfc" id="L902" title="All 2 branches covered.">    if (worldMap.getCurrentLocation().equals(&quot;CarPark&quot;)) {</span>
+<span class="fc" id="L903">      Achievement unlocked = achievementManager.unlockAchievement(&quot;totally_lost&quot;);</span>
+<span class="pc bpc" id="L904" title="1 of 2 branches missed.">      if (unlocked != null) {</span>
+<span class="fc" id="L905">        achievementNotification.show(unlocked);</span>
+      }
+    }
+<span class="fc" id="L908">  }</span>
+
+  public WorldMap getWorldMap() {
+<span class="fc" id="L911">    return worldMap;</span>
+  }
+
+  public SlipOnCoffee getCoffeeEvent() {
+<span class="nc" id="L915">    return coffeeEvent;</span>
+  }
+
+  public Player getPlayer() {
+<span class="nc" id="L919">    return player;</span>
+  }
+
+  public Score getScore() {
+<span class="nc" id="L923">    return score;</span>
+  }
+
+  public ArrayList&lt;Item&gt; getItems() {
+<span class="fc" id="L927">    return items;</span>
+  }
+
+  @Override
+  public void resize(int width, int height) {
+    // Change [17/12/2025] - Update UI Stage viewport on resize
+<span class="nc bnc" id="L933" title="All 2 branches missed.">    if (uiStage != null) {</span>
+<span class="nc" id="L934">      uiStage.getViewport().update(width, height, true);</span>
+      // Update button positions based on actual screen size for responsiveness
+<span class="nc" id="L936">      updateButtonPositions(width, height);</span>
+    }
+<span class="nc" id="L938">  }</span>
+
+  /**
+   * Initialise UI and buttons for pause and instructions screen created 19/12/2025 when adding
+   * buttons.
+   */
+  private void initialiseui() {
+
+<span class="nc" id="L946">    uiStage = new Stage(new ScreenViewport());</span>
+
+<span class="nc" id="L948">    resumeButton = new TextButton(&quot;Resume&quot;, Main.uiSkin);</span>
+<span class="nc" id="L949">    resumeButton.setSize(240, 78);</span>
+<span class="nc bnc" id="L950" title="All 2 branches missed.">    if (resumeButton.getLabel() != null) {</span>
+<span class="nc" id="L951">      resumeButton.getLabel().setFontScale(1.5f);</span>
+    }
+<span class="nc" id="L953">    resumeButton.addListener(</span>
+<span class="nc" id="L954">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L957">            paused = false;</span>
+<span class="nc" id="L958">          }</span>
+        });
+<span class="nc" id="L960">    resumeButton.setVisible(false);</span>
+<span class="nc" id="L961">    uiStage.addActor(resumeButton);</span>
+
+<span class="nc" id="L963">    musicVolumeSlider = new Slider(0f, 1f, 0.01f, false, Main.uiSkin);</span>
+<span class="nc" id="L964">    musicVolumeSlider.setValue(audioManager.getMusicVolume());</span>
+<span class="nc" id="L965">    musicVolumeSlider.addListener(</span>
+<span class="nc" id="L966">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L969">            float volume = musicVolumeSlider.getValue();</span>
+<span class="nc" id="L970">            audioManager.setMusicVolume(volume);</span>
+<span class="nc" id="L971">          }</span>
+        });
+<span class="nc" id="L973">    musicVolumeSlider.setVisible(false);</span>
+<span class="nc" id="L974">    uiStage.addActor(musicVolumeSlider);</span>
+
+<span class="nc" id="L976">    musicVolumeLabel = new Label(&quot;Music Volume&quot;, Main.uiSkin);</span>
+<span class="nc" id="L977">    musicVolumeLabel.setFontScale(1.0f);</span>
+<span class="nc" id="L978">    musicVolumeLabel.setVisible(false);</span>
+<span class="nc" id="L979">    uiStage.addActor(musicVolumeLabel);</span>
+
+<span class="nc" id="L981">    volumeSlider = new Slider(0f, 1f, 0.01f, false, Main.uiSkin);</span>
+<span class="nc" id="L982">    volumeSlider.setValue(audioManager.getVolume());</span>
+<span class="nc" id="L983">    volumeSlider.addListener(</span>
+<span class="nc" id="L984">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L987">            float volume = volumeSlider.getValue();</span>
+<span class="nc" id="L988">            audioManager.setVolume(volume);</span>
+<span class="nc" id="L989">          }</span>
+        });
+<span class="nc" id="L991">    volumeSlider.setVisible(false);</span>
+<span class="nc" id="L992">    uiStage.addActor(volumeSlider);</span>
+
+<span class="nc" id="L994">    volumeLabel = new Label(&quot;Volume&quot;, Main.uiSkin);</span>
+<span class="nc" id="L995">    volumeLabel.setFontScale(1.0f);</span>
+<span class="nc" id="L996">    volumeLabel.setVisible(false);</span>
+<span class="nc" id="L997">    uiStage.addActor(volumeLabel);</span>
+
+<span class="nc" id="L999">    closeInstructionButton = new TextButton(&quot;Close&quot;, Main.uiSkin);</span>
+<span class="nc" id="L1000">    closeInstructionButton.setSize(150, 30);</span>
+    // Set initial font scale to 1.0 (will be updated in updateButtonPositions)
+<span class="nc bnc" id="L1002" title="All 2 branches missed.">    if (closeInstructionButton.getLabel() != null) {</span>
+<span class="nc" id="L1003">      closeInstructionButton.getLabel().setFontScale(1.0f);</span>
+    }
+<span class="nc" id="L1005">    closeInstructionButton.addListener(</span>
+<span class="nc" id="L1006">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L1009">            showInstruction = false;</span>
+<span class="nc" id="L1010">            paused = false;</span>
+<span class="nc" id="L1011">          }</span>
+        });
+<span class="nc" id="L1013">    closeInstructionButton.setVisible(false);</span>
+<span class="nc" id="L1014">    uiStage.addActor(closeInstructionButton);</span>
+
+    // Change: add return button
+<span class="nc" id="L1017">    returnButton = new TextButton(&quot;Return to home screen&quot;, Main.uiSkin);</span>
+<span class="nc" id="L1018">    returnButton.addListener(</span>
+<span class="nc" id="L1019">        new ChangeListener() {</span>
+          @Override
+          public void changed(ChangeEvent event, com.badlogic.gdx.scenes.scene2d.Actor actor) {
+<span class="nc" id="L1022">            game.resetGame();</span>
+<span class="nc" id="L1023">            game.setScreen(new HomeScreen(game));</span>
+<span class="nc" id="L1024">          }</span>
+        });
+<span class="nc" id="L1026">    uiStage.addActor(returnButton);</span>
+<span class="nc" id="L1027">    returnButton.setVisible(false);</span>
+
+    // Setup InputMultiplexer to handle both keyboard and Stage input
+    // InputMultiplexer to handle both keyboard and Stage input
+<span class="nc" id="L1031">    InputMultiplexer inputMultiplexer = new InputMultiplexer();</span>
+<span class="nc" id="L1032">    inputMultiplexer.addProcessor(uiStage);</span>
+<span class="nc" id="L1033">    Gdx.input.setInputProcessor(inputMultiplexer);</span>
+
+    // Initialize button positions based on current screen size
+<span class="nc" id="L1036">    updateButtonPositions(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());</span>
+<span class="nc" id="L1037">  }</span>
+
+  /**
+   * Update button size and position based on actual screen dimensions for screen responsiveness.
+   */
+  private void updateButtonPositions(float screenWidth, float screenHeight) {
+
+    // Store original button sizes for scaling calculations
+<span class="nc" id="L1045">    final float resumeButtonOriginalWidth = 240f;</span>
+<span class="nc" id="L1046">    final float resumeButtonOriginalHeight = 40f;</span>
+<span class="nc" id="L1047">    final float closeButtonOriginalWidth = 150f;</span>
+<span class="nc" id="L1048">    final float closeButtonOriginalHeight = 30f;</span>
+    // Store offset from right and top edges for Close button (top right corner)
+<span class="nc" id="L1050">    final float closeButtonRightOffset = 10f;</span>
+<span class="nc" id="L1051">    final float closeButtonTopOffset = 43f;</span>
+    // Added InputMultiplexer to handle both keyboard and Stage input
+    // Store original slider and label sizes for scaling calculations
+<span class="nc" id="L1054">    final float volumeSliderOriginalWidth = 240;</span>
+<span class="nc" id="L1055">    final float volumeSliderOriginalHeight = 20f;</span>
+    //  Store offset from right and top edges for volume controls
+<span class="nc" id="L1057">    final float volumeTopOffset = 120f;</span>
+<span class="nc" id="L1058">    final float musicVolumeTopOffset = 180f;</span>
+
+    // Calculate scale factors based on screen size relative to original viewport size
+<span class="nc" id="L1061">    float scaleX = screenWidth / Main.VIEWPORT_SIZE.x;</span>
+<span class="nc" id="L1062">    float scaleY = screenHeight / Main.VIEWPORT_SIZE.y;</span>
+    // Calculate font scale using average of X and Y scales for readability
+<span class="nc" id="L1064">    float fontScale = (scaleX + scaleY) / 2f;</span>
+
+<span class="nc bnc" id="L1066" title="All 2 branches missed.">    if (resumeButton != null) {</span>
+      // Update button size proportionally
+<span class="nc" id="L1068">      resumeButton.setSize(resumeButtonOriginalWidth * scaleX, resumeButtonOriginalHeight * scaleY);</span>
+
+<span class="nc bnc" id="L1070" title="All 2 branches missed.">      if (resumeButton.getLabel() != null) {</span>
+<span class="nc" id="L1071">        resumeButton.getLabel().setFontScale(fontScale);</span>
+      }
+
+<span class="nc" id="L1074">      float relativeX = 0.5f;</span>
+<span class="nc" id="L1075">      float relativeY = 0.5f - (35f / Main.VIEWPORT_SIZE.y);</span>
+<span class="nc" id="L1076">      resumeButton.setPosition(</span>
+<span class="nc" id="L1077">          screenWidth * relativeX - resumeButton.getWidth() / 2f, screenHeight * relativeY);</span>
+    }
+
+<span class="nc bnc" id="L1080" title="All 2 branches missed.">    if (closeInstructionButton != null) {</span>
+      // Update button size proportionally
+<span class="nc" id="L1082">      closeInstructionButton.setSize(</span>
+          closeButtonOriginalWidth * scaleX, closeButtonOriginalHeight * scaleY);
+
+      // Update font scale to match button size scaling
+<span class="nc bnc" id="L1086" title="All 2 branches missed.">      if (closeInstructionButton.getLabel() != null) {</span>
+<span class="nc" id="L1087">        closeInstructionButton.getLabel().setFontScale(fontScale);</span>
+      }
+
+      // Maintain position in top right corner with scaled offsets
+<span class="nc" id="L1091">      float rightOffset = closeButtonRightOffset * scaleX;</span>
+<span class="nc" id="L1092">      float topOffset = closeButtonTopOffset * scaleY;</span>
+<span class="nc" id="L1093">      closeInstructionButton.setPosition(</span>
+<span class="nc" id="L1094">          screenWidth - closeInstructionButton.getWidth() - rightOffset,</span>
+<span class="nc" id="L1095">          screenHeight - closeInstructionButton.getHeight() - topOffset);</span>
+    }
+
+<span class="nc bnc" id="L1098" title="All 2 branches missed.">    if (returnButton != null) {</span>
+<span class="nc" id="L1099">      returnButton.setSize(resumeButtonOriginalWidth * scaleX, resumeButtonOriginalHeight * scaleY);</span>
+<span class="nc bnc" id="L1100" title="All 2 branches missed.">      if (returnButton.getLabel() != null) {</span>
+<span class="nc" id="L1101">        returnButton.getLabel().setFontScale(fontScale);</span>
+      }
+
+<span class="nc" id="L1104">      float relativeX = 0.5f;</span>
+<span class="nc" id="L1105">      float relativeY = 0.5f - (80f / Main.VIEWPORT_SIZE.y);</span>
+<span class="nc" id="L1106">      returnButton.setPosition(</span>
+<span class="nc" id="L1107">          screenWidth * relativeX - returnButton.getWidth() / 2f, screenHeight * relativeY);</span>
+    }
+<span class="nc bnc" id="L1109" title="All 2 branches missed.">    if (musicVolumeSlider != null) {</span>
+      // Update slider size: only width scales, height stays fixed to prevent thickness change
+<span class="nc" id="L1111">      musicVolumeSlider.setSize(</span>
+          volumeSliderOriginalWidth * scaleX,
+          volumeSliderOriginalHeight // Height stays fixed, doesn't scale
+      );
+
+      // Maintain position in top right corner with scaled offsets
+<span class="nc" id="L1117">      float topOffset = musicVolumeTopOffset * scaleY; // Top offset scales with screen height</span>
+
+<span class="nc" id="L1119">      musicVolumeSlider.setPosition(</span>
+<span class="nc" id="L1120">          (screenWidth - musicVolumeSlider.getWidth()) / 2,</span>
+<span class="nc" id="L1121">          screenHeight * 0.5f - musicVolumeSlider.getHeight() - topOffset);</span>
+    }
+
+<span class="nc bnc" id="L1124" title="All 2 branches missed.">    if (musicVolumeLabel != null) {</span>
+      // Update font scale to match UI scaling
+<span class="nc" id="L1126">      musicVolumeLabel.setFontScale(fontScale);</span>
+
+      // Position label above slider, right-aligned
+<span class="nc" id="L1129">      float topOffset = musicVolumeTopOffset * scaleY;</span>
+
+      // Calculate label position: above slider with proper spacing
+      // Note: slider height is fixed, so use original height
+<span class="nc" id="L1133">      float labelY = screenHeight * 0.5f - topOffset;</span>
+
+<span class="nc" id="L1135">      musicVolumeLabel.setPosition((screenWidth - musicVolumeSlider.getWidth()) / 2, labelY);</span>
+    }
+
+<span class="nc bnc" id="L1138" title="All 2 branches missed.">    if (volumeSlider != null) {</span>
+      // Update slider size: only width scales, height stays fixed to prevent thickness change
+<span class="nc" id="L1140">      volumeSlider.setSize(</span>
+          volumeSliderOriginalWidth * scaleX,
+          volumeSliderOriginalHeight // Height stays fixed, doesn't scale
+      );
+
+      // Maintain position in top right corner with scaled offsets
+<span class="nc" id="L1146">      float topOffset = volumeTopOffset * scaleY; // Top offset scales with screen height</span>
+
+<span class="nc" id="L1148">      volumeSlider.setPosition(</span>
+<span class="nc" id="L1149">          (screenWidth - volumeSlider.getWidth()) / 2,</span>
+<span class="nc" id="L1150">          screenHeight * 0.5f - volumeSlider.getHeight() - topOffset);</span>
+    }
+
+<span class="nc bnc" id="L1153" title="All 2 branches missed.">    if (volumeLabel != null) {</span>
+      // Update font scale to match UI scaling
+<span class="nc" id="L1155">      volumeLabel.setFontScale(fontScale);</span>
+
+      // Position label above slider, right-aligned
+<span class="nc" id="L1158">      float topOffset = volumeTopOffset * scaleY;</span>
+
+      // Calculate label position: above slider with proper spacing
+      // Note: slider height is fixed, so use original height
+<span class="nc" id="L1162">      float labelY = screenHeight * 0.5f - topOffset;</span>
+
+<span class="nc" id="L1164">      volumeLabel.setPosition((screenWidth - volumeSlider.getWidth()) / 2, labelY);</span>
+    }
+<span class="nc" id="L1166">  }</span>
+
+  @Override
+  public void dispose() {
+<span class="nc" id="L1170">    pauseOverlay.dispose();</span>
+<span class="nc" id="L1171">    instructionOverlay.dispose();</span>
+<span class="nc" id="L1172">    player.dispose();</span>
+    // Change [17/12/2025] - Dispose UI Stage resources
+<span class="nc bnc" id="L1174" title="All 2 branches missed.">    if (uiStage != null) {</span>
+<span class="nc" id="L1175">      uiStage.dispose();</span>
+    }
+<span class="nc" id="L1177">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
