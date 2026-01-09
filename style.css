@@ -300,9 +300,40 @@ a{
     border: 3px solid rgb(200, 155, 241);
     
 }
+.old-cards  .crc-card{
+      border: 3px solid rgb(0, 0, 0);
+      background-color: lightgray;
+
+}
 
 .crc-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(48%, 1fr));
     gap: 20px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.trace-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.trace-table th,
+.trace-table td {
+  padding: 10px;
+  border: 1px solid rgba(0,0,0,0.2);
+  text-align: left;
+  vertical-align: top;
+}
+
+.trace-table thead {
+  background: #ececf7;
+}
+
+.trace-table tbody tr:nth-child(even) {
+  background: #fafafe;
 }

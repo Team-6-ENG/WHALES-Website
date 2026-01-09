@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUACK? | Planning</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="site-title">QUACK?</div>
+      <div class="site-subtitle">
+        ENG1 Project - Cohort 4 Team 6, inherited from Team 1
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs">
+      <a class="tab" href="index.html">Overview</a>
+      <a class="tab" href="deliverables.html">Project Documents</a>
+
+      <div class="tab dropdown active">
+        <div tabindex="0">Architecture Design ▶</div>
+        <div class="dropdown-menu">
+          <a href="crc.html">CRC cards</a>
+          <a href="">CRC to requirements map</a>
+          <a href="sequences.html">Sequence Diagrams</a>
+          <a href="classDiagrams.html">Class Diagrams</a>
+        </div>
+      </div>
+
+      <a class="tab" href="planning.html">Planning</a>
+      <a class="tab" href="interviews.html">Interviews</a>
+            <a class="tab" href="testing.html">Testing</a>
+      <a class="tab" href="attributions.html">Attributions</a>
+      <a class="tab" href="https://whales-game.netlify.app" target="_blank">Assessment 1 Website</a>
+    </nav>
+  </div>
+<main class="page">
+  <section class="card">
+    <h1>CRC Cards &amp; Traceability Matrix</h1>
+
+    <div class="table-wrap">
+      <table class="trace-table">
+        <thead>
+          <tr>
+            <th>Requirement ID</th>
+            <th>Requirement Description</th>
+            <th>CRC Cards Involved</th>
+            <th>Implementation Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>UR_MAP</td><td>Player moves through various areas on a hidden map</td><td>WorldMap, JsonRoom, JsonObstacle, WorldScreen</td><td>Multi-room navigation with JSON configuration, room transitions</td></tr>
+          <tr><td>UR_EVENTS</td><td>Events triggered at visible/hidden checkpoints</td><td>Event, HiddenEvent, Frog, Security, SlipOnCoffee, DuckStatue, WindEvent, PowerCut, RamblingProfessorEvent</td><td>Complete event system with interface hierarchy, multiple event types</td></tr>
+          <tr><td>UR_EVENTS_LOCATION</td><td>Hidden/visible events in random positions each play</td><td>WorldMap, JsonRoom, JsonObstacle</td><td>JSON configuration enables procedural room/obstacle placement</td></tr>
+          <tr><td>UR_ENERGY</td><td>Energy/health levels changed by events</td><td>Energy, Player</td><td>Tick-based regeneration, sprint energy consumption, accessibility states</td></tr>
+          <tr><td>UR_MUSIC</td><td>Background music with volume control</td><td>AudioManager</td><td>Centralized audio service with play/stop/volume/mute controls</td></tr>
+          <tr><td>UR_SOUND_EFFECTS</td><td>Sound effects triggered by special events</td><td>AudioManager, WorldScreen, Event classes</td><td>Event-triggered sounds managed through AudioManager</td></tr>
+          <tr><td>UR_INSTRUCTION</td><td>One-page instruction screen</td><td>GameIntroScreen</td><td>Dedicated introduction screen with game controls</td></tr>
+          <tr><td>UR_TIMER</td><td>Timer counting down while playing</td><td>Timer, WorldScreen</td><td>Delta-time calculation, visible countdown, professional formatting</td></tr>
+          <tr><td>UR_TIME_LIMIT</td><td>Game completed in under 5 minutes</td><td>Timer, Main</td><td>5-minute countdown with game over logic</td></tr>
+          <tr><td>UR_DISPLAYS</td><td>Suitable for large monitor display</td><td>All Screen classes, AchievementNotificationScene</td><td>2D framework, professional UI, multiple screen sizes</td></tr>
+          <tr><td>UR_CONTROLS</td><td>Mouse or keyboard character movement</td><td>Player, WorldScreen</td><td>Keyboard (WASD/Arrows) + mouse input, Scene2D integration</td></tr>
+          <tr><td>UR_MENU</td><td>Menu system for game navigation</td><td>HomeScreen, Main, All Screen classes</td><td>Complete menu system with screen transitions</td></tr>
+          <tr><td>UR_UI</td><td>Pleasing, easy-to-navigate UI</td><td>All Screen classes, AchievementNotification</td><td>Professional UI with consistent navigation patterns</td></tr>
+          <tr><td>FR_POSITIVE_EVENTS</td><td>Positive effects benefiting character (x3)</td><td>Item, DuckStatue, AchievementManager</td><td>Collectible items, statue completion, achievement rewards</td></tr>
+          <tr><td>FR_DRINK_POSITIVE</td><td>Vending machine temporary buff</td><td>Item (CONSUMABLE type)</td><td>Consumable item system with temporary effects</td></tr>
+          <tr><td>FR_SCORE_BONUS</td><td>Map items increase score</td><td>Score, AchievementManager</td><td>Achievement-based scoring, time bonuses</td></tr>
+          <tr><td>FR_NEGATIVE_EVENTS</td><td>Negative effects hindering gameplay (x5)</td><td>Frog, Security, SlipOnCoffee, WindEvent, PowerCut</td><td>Multiple negative events with varied penalties</td></tr>
+          <tr><td>FR_LIGHTS_NEGATIVE</td><td>Vision loss from lights failing</td><td>PowerCut</td><td>Darkness effect during power cuts</td></tr>
+          <tr><td>FR_SECURITY_NEGATIVE</td><td>Apprehended by campus security</td><td>Security, DuckStatue</td><td>Security patrols, statue protection mechanics</td></tr>
+          <tr><td>FR_COFFEE_NEGATIVE</td><td>Slip in coffee slows player</td><td>SlipOnCoffee</td><td>Movement penalty with slip effect</td></tr>
+          <tr><td>FR_FROG_NEGATIVE</td><td>Frog interaction slows player</td><td>Frog</td><td>Chasing AI with player slowdown</td></tr>
+          <tr><td>FR_HIDDEN_EVENTS</td><td>Surprise events on collision (x3)</td><td>HiddenEvent, WindEvent, RamblingProfessorEvent, PowerCut</td><td>Abstract hidden event system with multiple implementations</td></tr>
+          <tr><td>FR_WIND_HIDDEN</td><td>Windy effect on main path</td><td>WindEvent</td><td>Wind effects modifying player movement speed</td></tr>
+          <tr><td>FR_PROFFESSOR_HIDDEN</td><td>Professor providing no assistance</td><td>RamblingProfessorEvent</td><td>Professor interaction system</td></tr>
+          <tr><td>FR_ENERGY</td><td>Energy system for sprinting</td><td>Energy, Player</td><td>Sprint system with energy consumption/regeneration</td></tr>
+          <tr><td>FR_MUSIC</td><td>Background music during play</td><td>AudioManager</td><td>Continuous background music with looping</td></tr>
+          <tr><td>FR_MUSIC_VOLUME</td><td>Adjustable/mutable music volume</td><td>AudioManager</td><td>Volume slider and mute toggle functionality</td></tr>
+          <tr><td>FR_SOUND_EFFECTS</td><td>Event-triggered sound effects</td><td>AudioManager, Event classes</td><td>Centralized sound effect management</td></tr>
+          <tr><td>FR_INSTRUCTION</td><td>Read game controls from screen</td><td>GameIntroScreen</td><td>Clear instruction text and control diagram</td></tr>
+          <tr><td>FR_BUTTON</td><td>Clickable buttons for navigation</td><td>All Screen classes</td><td>Scene2D button system throughout all screens</td></tr>
+          <tr><td>FR_MAIN_MENU</td><td>Central navigation menu</td><td>HomeScreen, Main</td><td>Main menu with game start, leaderboard, achievements</td></tr>
+          <tr><td>FR_PAUSE</td><td>Pause button stopping timer</td><td>WorldScreen, Timer</td><td>Pause functionality with timer suspension</td></tr>
+          <tr><td>FR_LEADERBOARD</td><td>Accessible leaderboard menu</td><td>LeaderboardScreen, LeaderboardManager</td><td>Complete leaderboard with score saving/loading</td></tr>
+          <tr><td>FR_TIMER</td><td>On-screen countdown during play</td><td>Timer, WorldScreen</td><td>Visible timer display during gameplay</td></tr>
+          <tr><td>FR_TIMER_END</td><td>Game over on timer completion</td><td>Timer, Main</td><td>Game over logic triggered at timer zero</td></tr>
+          <tr><td>FR_CAMERA</td><td>Stationary camera per room</td><td>WorldScreen, WorldMap</td><td>Fixed camera with room transition system</td></tr>
+          <tr><td>NFR_LOADING</td><td>Game loads quickly (&lt;5 seconds)</td><td>Main, All Managers</td><td>Efficient asset loading, asynchronous initialization</td></tr>
+          <tr><td>NFR_TIME_LIMIT</td><td>Game finishes within 5 minutes</td><td>Timer, Main</td><td>Enforced 5-minute gameplay limit</td></tr>
+          <tr><td>NFR_SHAPES</td><td>Shapes used alongside colors for accessibility</td><td>All visual classes</td><td>Shape-based UI elements, colorblind-friendly design</td></tr>
+          <tr><td>CR_JAVA</td><td>Implemented in Java 17</td><td>All Code</td><td>Java 17 language features used throughout</td></tr>
+          <tr><td>CR_OPERATING_SYSTEMS</td><td>Runs on Windows, Mac, Linux</td><td>LibGDX Framework</td><td>Cross-platform LibGDX framework implementation</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+
+
+</body>
+</html>
