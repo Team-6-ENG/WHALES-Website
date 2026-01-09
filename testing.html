@@ -41,43 +41,105 @@
         </nav>
     </div>
     <main class="page">
-        
-  <section class="card">
-            <!-- Main centre container for the page -->
-                <h1>Test Reports</h1>
-                <br>
+
+        <section class="card">
+            <h1>Test Reports</h1>
+            <br>
 
 
-                <a class="access-link" target = "_blank" href="./testReports/checkstyle.html">
-                    <h2>Check Style Report</h2>
-                </a>
-                <a class="access-link" target = "_blank" href="./testReports/jacoco/jacoco.html">
-                    <h2>Jacoco Report</h2>
-                </a>
-                <a class="access-link" target = "_blank"href="./testReports/jacoco/jacoco-sessions.html">
-                    <h2>Jacoco Sessions</h2>
-                </a>
-                <a class="access-link" target = "_blank" href="./testReports/testReportWindows.html">
-                    <h2>Test Report Windows</h2>
-                </a>
-                <a class="access-link" target = "_blank" href="./testReports/testReportMacOS.html">
-                    <h2>Test Report MacOS</h2>
-                </a>
-                <a class="access-link" target = "_blank" href="./testReports/testReportUbuntu.html">
-                    <h2>Test Report Ubuntu</h2>
-                </a>
+            <a class="access-link" target="_blank" href="./testReports/checkstyle.html">
+                <h2>Check Style Report</h2>
+            </a>
+            <a class="access-link" target="_blank" href="./testReports/jacoco/jacoco.html">
+                <h2>Jacoco Report</h2>
+            </a>
+            <a class="access-link" target="_blank" href="./testReports/jacoco/jacoco-sessions.html">
+                <h2>Jacoco Sessions</h2>
+            </a>
+            <a class="access-link" target="_blank" href="./testReports/testReportWindows.html">
+                <h2>Test Report Windows</h2>
+            </a>
+            <a class="access-link" target="_blank" href="./testReports/testReportMacOS.html">
+                <h2>Test Report MacOS</h2>
+            </a>
+            <a class="access-link" target="_blank" href="./testReports/testReportUbuntu.html">
+                <h2>Test Report Ubuntu</h2>
+            </a>
 
-                
-                
+
+
+        </section>
+        <br><br>
+        <section class="card">
+            <h1>Testing / requirements tracability matrix</h1>
+            <h4>X - automated/unit tested</h4>
+            <h4>O - manually tested</h4>
+            <div class="table-wrap">
+                <table id="trace-table" class="trace-table">
+
+                </table>
+            </div>
+
+            <script>
+                const csvData = `Test Cases / Requirements ->,FR_ENERGY,FR_MUSIC,FR_MUSIC_VOLUME,FR_GOOSE_PIECES,FR_NEGATIVE_EVENTS,FR_HIDDEN_EVENTS,FR_PROFESSOR_HIDDEN,FR_WIND_HIDDEN,FR_COFFEE_NEGATIVE,FR_DRINK_NEGATIVE,FR_MAP,FR_LIMITS,FR_TIMER,FR_EVENTS_LOCATION,FR_SECURITY_NEGATIVE,FR_UI,FR_TITLE_SCREEN,FR_CHARACTER_CUSTOMISATION,FR_CUSTOMISATION_MENU,FR_POSITIVE_EVENTS,FR_DRINK_POSITIVE,FR_SCORE_BONUS,FR_MAP_ACCESS,FR_LIGHTS_NEGATIVE,FR_EVENTS_LINKED,FR_SOUND_EFFECTS,FR_INSTRUCTION,FR_BUTTON,FR_MAIN_MENU,FR_PAUSE,FR_LEADERBOARD,FR_ACHIEVEMENTS,FR_TIMER_END,FR_CONTROLS,FR_CAMERA,NFR_TIME_LIMIT,NFR_INSTRUCTION_SCREEN,NFR_INSTRUCTION_LOAD,NFR_LOADING,NFR_SHAPES,CR_OPERATING_SYSTEMS
+AchievementExtendedTests,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,x,,,,,,,,,
+AchievementNotificationExtendedTests,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,x,,,,,,,,,
+AchievementTests,,,,,,,,,,x,,,x,,,,,,,x,,,,,,,,,,,,x,,,,x,,,,,
+AudioManagerTests,,x,x,,,,,,,,,,,,,,,,,,,,,,x,x,,,,,,,,,,,,,,,
+DuckStatueExtendedTests,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+DuckStatuePieceTests,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+DuckStatueTests,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+EnergyTests,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+EventTests,,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+FrogTests,,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+GdxTestRunnerExtension,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+LeaderboardManagerTests,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,x,,,,,,,,,,
+MainTests,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PlayerTests,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+PowerCutTests,,,,,x,x,,,,,,,,,,,,,,,,,,x,,,,,,,,,,,,,,,,,
+RamblingProfessorEventExtendedTests,,,,,,x,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+RamblingProfessorEventTests,,,,,,x,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+ScoreEntryTests,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+ScoreTests,,,,,,,,,,,,,,,,,,,,,,x,,,,,,,,,,,,,,,,,,,
+SecurityTests,,,,,x,,,,,,,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,
+SlipOnCoffeeTests,,,,,x,,,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+TimerTests,,,,,,,,,,,,,x,,,,,,,,,,,,,,,,,,,x,x,,,x,,,,,
+WindEventExtendedTests,,,,,,x,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+WindyEventTests,,,,,,x,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+WorldMapTests,,,,,,,,,,,x,x,,x,,,,,,,,,,,,,,,,,,,,,,,,,,,
+WorldScreenTests,,,,,,,,,,,x,x,,,,,,,,x,x,,,,,,,,,,,,,,,,,,,,
+Manual Tests,,,,o,,,,,,,,,,,,o,o,o,o,,,,o,,,,o,o,o,o,,,,o,o,,o,o,o,o,
+Platform Test,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,x`;
+
+                function generateTable(csv) {
+                    const table = document.getElementById('trace-table');
+                    const rows = csv.split('\n');
+                    rows.forEach((row, rowIndex) => {
+                        const tr = document.createElement('tr');
+                        const cols = row.split(',');
+                        cols.forEach((col, colIndex) => {
+                            const cell = rowIndex === 0 ? document.createElement('th') : document.createElement('td');
+                            cell.textContent = col;
+                            if (col === 'x') cell.classList.add('x');
+                            if (col === 'o') cell.classList.add('o');
+                            tr.appendChild(cell);
+                        });
+                        table.appendChild(tr);
+                    });
+                }
+
+                generateTable(csvData);
+            </script>
+
         </section>
 
-                <br>
-                <div class="spacer"></div>
-                <p class="smaller">Uicons by <a href="https://www.flaticon.com/uicons" target="_blank">Flaticon</a></p>
-                <p class="smaller">This site is licensed under <a href="/LICENSE.txt" target="_blank">The Unlicense</a>
-                </p>
+        <br>
+        <div class="spacer"></div>
+        <p class="smaller">Uicons by <a href="https://www.flaticon.com/uicons" target="_blank">Flaticon</a></p>
+        <p class="smaller">This site is licensed under <a href="/LICENSE.txt" target="_blank">The Unlicense</a>
+        </p>
     </main>
-    
+
 </body>
 
 </html>
