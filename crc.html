@@ -24,9 +24,9 @@
                 <div tabindex="0">Architecture Design ▶</div>
                 <div class="dropdown-menu">
                     <a class="active" href="">CRC cards</a>
-                    <a href="#">CRC to requirements map</a>
-                    <a href="#">Sequence Diagrams</a>
-                    <a href="#">Class Diagrams</a>
+                    <a href="crcMap.html">CRC to requirements map</a>
+                    <a href="sequences.html">Sequence Diagrams</a>
+                    <a href="classDiagrams.html">Class Diagrams</a>
                 </div>
             </div>
 
@@ -40,6 +40,8 @@
 
     <main class="page">
 
+            <h1>Final CRC Cards (digitalised inherited cards below)</h1>
+            <br><br>
         <!-- Grid layout -->
         <div class="crc-grid">
 
@@ -660,6 +662,197 @@
 
         </div>
 
+        <br><hr><br>
+
+            <h1>CRC Cards From Part One (unchanged for part 2)</h1>
+            <br>
+             <div class="crc-grid old-cards">
+
+
+            <section class="card crc-card">
+                <h1>Class: Goose / Enemy</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Chase the player and reduce their energy</li>
+                    <li>Block the player’s path through rooms</li>
+                    <li>Reduce player energy when available or force the player to stop while energy regenerates</li>
+                    <li>React to distraction items such as duck food or statue</li>
+                    <li>Track the player’s current energy level</li>
+                    <li>Track what item the player is currently holding</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Controller</li>
+                    <li>Coordinator</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Inventory</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Display item icons (duck food, long boi statue) in the bottom-left corner</li>
+                    <li>Track which items the player currently has access to</li>
+                    <li>Allow items to be removed after use</li>
+                    <li>Provide item information to other game systems</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Information Holder</li>
+                    <li>Service Provider</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: CharacterElement</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a customisable segment of the character sprite</li>
+                    <li>Track which parts of the character are customisable</li>
+                    <li>Allow browsing through available items using arrows</li>
+                    <li>Store which items can be worn or equipped</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Information Holder</li>
+                    <li>Service Provider</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Player (CRC – Design Phase)</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Move around the screen and between rooms</li>
+                    <li>Interact with objects and events in the world</li>
+                    <li>Consume and manage energy which influences movement speed</li>
+                    <li>Track location within the room and across the map</li>
+                    <li>Detect key and mouse input (movement, sprint, pause, mute)</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Controller</li>
+                    <li>Coordinator</li>
+                    <li>Interfacer</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Door</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Enable movement between rooms</li>
+                    <li>Track whether the door is open or closed</li>
+                    <li>Check if a key is required and whether it has been obtained</li>
+                    <li>Act as an obstacle when locked</li>
+                    <li>Unlock new areas of the map</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Structurer</li>
+                    <li>Interfacer</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Room</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Represent a space where the player can explore</li>
+                    <li>Store room layout and location within the map</li>
+                    <li>Track events that may occur in the room</li>
+                    <li>Allow player movement through room paths and obstacles</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Coordinator</li>
+                    <li>Interfacer</li>
+                    <li>Information Holder</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Timer (CRC – Design Phase)</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Count down from five minutes</li>
+                    <li>Trigger warnings as time decreases</li>
+                    <li>End the game when time reaches zero</li>
+                    <li>Record remaining time for leaderboard use</li>
+                    <li>Determine when and where the timer should render</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Service Provider</li>
+                    <li>Information Holder</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Title / Home Screen</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Allow the player to start the game</li>
+                    <li>Provide access to leaderboard and settings</li>
+                    <li>Guide the player during loading and navigation</li>
+                    <li>Handle user selection and screen transitions</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Controller</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Music / Sound Controller</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Control background music and sound effects</li>
+                    <li>Allow muting and volume adjustment</li>
+                    <li>Track current mute state</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotype</h2>
+                <ul>
+                    <li>Controller</li>
+                </ul>
+            </section>
+
+            <section class="card crc-card">
+                <h1>Class: Button</h1>
+
+                <h2 class="section-heading">Responsibility</h2>
+                <ul>
+                    <li>Perform an action when clicked</li>
+                    <li>Track its screen position and interaction state</li>
+                    <li>Display correct text or icon</li>
+                </ul>
+
+                <h2 class="section-heading">Stereotypes</h2>
+                <ul>
+                    <li>Service Provider</li>
+                    <li>Interfacer</li>
+                </ul>
+            </section>
+
+        </div>
     </main>
 </body>
 
