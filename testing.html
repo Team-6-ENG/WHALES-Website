@@ -132,7 +132,135 @@ Platform Test,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,x`;
             </script>
 
         </section>
+    <section class="card">
+      <h1>Manual Tests</h1>
 
+      <div class="table-wrap">
+        <table class="trace-table">
+          <thead>
+            <tr>
+              <th>Test ID</th>
+              <th>Requirement</th>
+              <th>Description</th>
+              <th>Steps / Test Data</th>
+              <th>Expected Outcome</th>
+              <th>Actual Outcome</th>
+              <th>Test Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>MT-1</td>
+              <td>FR_CONTROLS</td>
+              <td>Keyboard and mouse character movement</td>
+              <td>1) Use WAS<br>2) Use arrows<br>3) Mouse movement</td>
+              <td>The character moves appropriately.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-2</td>
+              <td>FR_CAMERA</td>
+              <td>Visual rendering</td>
+              <td>1) Load game<br>2) Move between screens<br>3) Assess whether images are loading as intended</td>
+              <td>The assets should load correctly.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-3</td>
+              <td>FR_UI</td>
+              <td>The UI should be navigable and aesthetically pleasing</td>
+              <td>User evaluation:<br>The user tests play the game and is asked about art style and understanding of objectives.</td>
+              <td>The user should find the UI should be navigable and aesthetically pleasing.</td>
+              <td>Users enjoyed the style of the game but found navigation a little tricky.<br>Note: user evaluation critique has been addressed</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-4</td>
+              <td>NFR_SHAPES</td>
+              <td>Shapes and colours should be used to determine objects</td>
+              <td>User evaluation:<br>User tests play the game and is asked about whether the map resembled UOY</td>
+              <td>The user should be able to identify where they are and what items they interact with.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-5</td>
+              <td>FR_GOOSE_PIECES</td>
+              <td>The duck feet should be randomly appearing in an Anne Lister room</td>
+              <td>Repeatedly play test until every room has been randomly selected.</td>
+              <td>The duck feet should be randomly appearing in an Anne Lister room.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-6</td>
+              <td>FR_TITLE_SCREEN</td>
+              <td>The system will display the title screen when the game loads.</td>
+              <td>Load the game and check that title is visible.</td>
+              <td>Title screen visible.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-7</td>
+              <td>FR_MAIN_MENU</td>
+              <td>Navigate through menu options</td>
+              <td>1) Load the main menu<br>2) Interact with options</td>
+              <td>The menu screen should load. Interacting with options should produce expected output.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-8</td>
+              <td>FR_BUTTON</td>
+              <td>Able to click buttons</td>
+              <td>Click all visible buttons</td>
+              <td>They should all function as described to the user.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-9</td>
+              <td>FR_CHARACTER_CUSTOMISATION</td>
+              <td>Able to choose between multiple characters</td>
+              <td>1) Load game and select character option #1<br>2) Play test functionality<br>3) Load game and select character option #2<br>4) Play test functionality</td>
+              <td>The character you select is the character that you play as. The character should be animated as intended and remain consistent the entire game.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-10</td>
+              <td>FR_PAUSE</td>
+              <td>Clicking pause and play will have the standard effect on timer</td>
+              <td>1) Click pause<br>2) Click play<br>3) Observe timer</td>
+              <td>The pause screen should display and disappear. The timer should also pause and play its countdown. The game should correctly resume.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-11</td>
+              <td>FR_LEADERBOARD</td>
+              <td>Name and score displayed</td>
+              <td>1) Win the game multiple times with different levels of event interaction and different amounts of time taken<br>2) Check display</td>
+              <td>The name and score should correctly display on the leaderboard. When a higher score is achieved, the leaderboard should shift accordingly.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+            <tr>
+              <td>MT-12</td>
+              <td>FR_INSTRUCTION</td>
+              <td>Read and verify that it’s clear</td>
+              <td>User Evaluation:<br>Ask the user about their understanding of the controls and game objective</td>
+              <td>The user should be able to understand their game controls and the objective of the game.</td>
+              <td>As expected</td>
+              <td>PASS</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
         <br>
         <div class="spacer"></div>
         <p class="smaller">Uicons by <a href="https://www.flaticon.com/uicons" target="_blank">Flaticon</a></p>
